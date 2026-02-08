@@ -1,0 +1,55 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# Node / frontend
+node_modules/
+frontend/dist/
+dist/
+build/
+
+# Local data and generated artifacts
+backend/data/
+ml/data/raw/*
+!ml/data/raw/.gitkeep
+!ml/data/raw/*/
+!ml/data/raw/*/.gitkeep
+ml/data/datasets/*
+!ml/data/datasets/.gitkeep
+ml/models/pretrained/*
+!ml/models/pretrained/.gitkeep
+ml/models/trained/*
+!ml/models/trained/.gitkeep
+ml/results/*
+!ml/results/.gitkeep
+*.pt
+*.pth
+*.weights
+*.tif
+*.tiff
+*.gpkg
+*.shp
+*.shx
+*.dbf
+*.prj
+
+# Logs and accidental output
+*.log
+backend/=2.0.0
+runs/
+VidVision_Training/
+yolo_dataset*/
+
+# OS / editor metadata
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+*:Zone.Identifier

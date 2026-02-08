@@ -1,0 +1,78 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb_checkpoints/
+notebooks/*
+!notebooks/.gitkeep
+!notebooks/*.ipynb
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Datos grandes (no subir a git)
+data/raw/*
+!data/raw/.gitkeep
+!data/raw/*/
+!data/raw/*/.gitkeep
+data/datasets/*
+!data/datasets/.gitkeep
+*.tif
+*.tiff
+*.gpkg
+*.shp
+*.shx
+*.dbf
+*.prj
+
+# Modelos y pesos (muy grandes)
+models/pretrained/*
+!models/pretrained/.gitkeep
+models/trained/*
+!models/trained/.gitkeep
+*.pt
+*.pth
+*.weights
+
+# Resultados de entrenamientos
+results/*
+!results/.gitkeep
+scripts/results/
+VidVision_Training/
+runs/
+yolo_dataset*/
+
+# Logs
+*.log
+logs/
+
+# Sistema
+.DS_Store
+Thumbs.db

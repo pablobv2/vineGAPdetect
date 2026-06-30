@@ -1,0 +1,33 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    volumes:
+      # Modelo: solo lectura (se monta desde la carpeta de trabajo).
+      - ./ml/models/trained:/app/ml/models/trained:ro
+      # Datos persistentes: SQLite + users.json + artefactos de historial.
+      - ./backend/data:/app/backend/data
+    environment:
+      DEVICE: cpu
+      # Permite CORS desde la origin de nginx (puerto 80).
+      FRONTEND_ORIGIN: "http://localhost"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      # El backend tarda en cargar el modelo YOLO al arrancar.
+      start_period: 90s
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped

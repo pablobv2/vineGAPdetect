@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { ApiError, getJob } from "../api/client";
 import type { JobStatusResponse } from "../api/types";
 
+/** Consulta periodicamente un job del backend hasta completarse o fallar y expone su progreso. */
 export function useJobPolling<T>(jobId: string | null, enabled = true, intervalMs = 800) {
   const [job, setJob] = useState<JobStatusResponse<T> | null>(null);
   const [error, setError] = useState<string | null>(null);

@@ -1,0 +1,320 @@
+\chapter{Backend}
+
+
+\section{Arranque y composición}
+\subsubsection*{backend/app/main.py (module)}
+\noindent\textbf{Fichero:} \texttt{backend/app/main.py}\\
+Punto de entrada de la API FastAPI de vineGAPdetect. El modulo compone la aplicacion backend: inicializa la base de datos SQLite, crea los servicios de usuarios, autenticacion, gestion de jobs, inferencia y explicabilidad, configura CORS para el frontend y registra todas las rutas bajo el prefijo de API. El ciclo de vida inicia el worker de trabajos al arrancar y lo detiene al cerrar la aplicacion.
+
+
+
+\section{Endpoints FastAPI}
+\subsubsection*{POST /api/v1/auth/login}
+\begin{description}[leftmargin=2.8cm,style=nextline]
+\item[Handler] login
+\item[Acceso] publico
+\item[Respuesta] SessionResponse
+\end{description}
+Autentica un usuario y crea una sesion con token bearer.
+
+
+\subsubsection*{POST /api/v1/auth/logout}
+\begin{description}[leftmargin=2.8cm,style=nextline]
+\item[Handler] logout
+\item[Acceso] usuario autenticado
+\item[Respuesta] MessageResponse
+\end{description}
+Invalida la sesion activa y confirma el cierre al usuario.
+
+
+\subsubsection*{GET /api/v1/auth/me}
+\begin{description}[leftmargin=2.8cm,style=nextline]
+\item[Handler] me
+\item[Acceso] usuario autenticado
+\item[Respuesta] UserPublic
+\end{description}
+Devuelve los datos publicos del usuario asociado al token actual.
+
+
+\subsubsection*{POST /api/v1/export/detections-gpkg}
+\begin{description}[leftmargin=2.8cm,style=nextline]
+\item[Handler] export\_detections\_gpkg
+\item[Acceso] usuario autenticado
+\item[Respuesta] -
+\end{description}
+Genera un GeoPackage con las detecciones georreferenciadas del analisis. Recibe detecciones filtradas, CRS y transformacion afin del GeoTIFF original, convierte poligonos OBB de pixeles a coordenadas reales y devuelve un fichero GPKG descargable para uso en software GIS.
+
+
+\subsubsection*{GET /api/v1/health}
+\begin{description}[leftmargin=2.8cm,style=nextline]
+\item[Handler] health
+\item[Acceso] publico
+\item[Respuesta] HealthResponse
+\end{description}
+Informa del estado de la API, el dispositivo configurado y la disponibilidad del modelo.
+
+
+\subsubsection*{GET /api/v1/history}
+\begin{description}[leftmargin=2.8cm,style=nextline]
+\item[Handler] get\_history
+\item[Acceso] usuario autenticado
+\item[Respuesta] list[AnalysisHistoryItem]
+\end{description}
+Lista analisis historicos visibles para el usuario autenticado. Los administradores consultan todos los registros y los operarios solo los suyos. La respuesta contiene resumenes, parametros usados y metadatos de imagen suficientes para navegar y filtrar el historico.
+
+
+\subsubsection*{GET /api/v1/history/quota}
+\begin{description}[leftmargin=2.8cm,style=nextline]
+\item[Handler] get\_user\_quota
+\item[Acceso] usuario autenticado
+\item[Respuesta] QuotaResponse
+\end{description}
+Devuelve el espacio usado y el limite de almacenamiento del usuario. Calcula la cuota a partir de las parcelas guardadas en el historico y permite al frontend bloquear nuevas conservaciones antes de superar el maximo configurado para cada cuenta.
+
+
+\subsubsection*{DELETE /api/v1/history/\{history\_id\}}
+\begin{description}[leftmargin=2.8cm,style=nextline]
+\item[Handler] delete\_history\_item
+\item[Acceso] usuario autenticado
+\item[Respuesta] -
+\end{description}
+Borra un analisis historico y su artefacto fuente si existe.
+
+
+\subsubsection*{GET /api/v1/history/\{history\_id\}}
+\begin{description}[leftmargin=2.8cm,style=nextline]
+\item[Handler] get\_history\_item
+\item[Acceso] usuario autenticado
+\item[Respuesta] AnalysisHistoryDetail
+\end{description}
+Recupera detalle, previsualizacion, resultado y XAI almacenados de un analisis. Devuelve la informacion necesaria para restaurar el dashboard: imagen previsualizada, JSON de detecciones, parametros de ejecucion, metadatos geoespaciales y mapa XAI precalculado si existe.
+
+
+\subsubsection*{POST /api/v1/history/\{history\_id\}/save}
+\begin{description}[leftmargin=2.8cm,style=nextline]
+\item[Handler] save\_history\_item
+\item[Acceso] usuario autenticado
+\item[Respuesta] SaveParcelResponse
+\end{description}
+Marca una inferencia historica como parcela guardada del usuario. Verifica permisos, evita duplicados por hash o metadatos de fichero, comprueba la cuota disponible y conserva el registro para que aparezca en Mis parcelas sin duplicar el artefacto fuente.
+
+
+\subsubsection*{POST /api/v1/history/\{history\_id\}/xai}
+\begin{description}[leftmargin=2.8cm,style=nextline]
+\item[Handler] create\_history\_xai\_job
+\item[Acceso] usuario autenticado
+\item[Respuesta] JobAcceptedResponse
+\end{description}
+Crea un trabajo XAI reutilizando la imagen original guardada en el historial. Recupera el artefacto fuente persistido, selecciona la deteccion indicada o la mejor segun umbral, calcula su centro y lanza un job Eigen-CAM enfocado sobre esa marra sin repetir la inferencia completa.
+
+
+\subsubsection*{POST /api/v1/jobs/inference}
+\begin{description}[leftmargin=2.8cm,style=nextline]
+\item[Handler] create\_inference\_job
+\item[Acceso] operador/administrador
+\item[Respuesta] JobAcceptedResponse
+\end{description}
+Registra un trabajo asincrono de inferencia YOLO sobre la imagen subida. Valida tamano y disponibilidad del modelo, conserva parametros de corte por teselas, umbral de confianza, solape y ancho tipico de cepa, y delega la ejecucion en JobManager para que el frontend consulte progreso sin bloquear.
+
+
+\subsubsection*{POST /api/v1/jobs/xai}
+\begin{description}[leftmargin=2.8cm,style=nextline]
+\item[Handler] create\_xai\_job
+\item[Acceso] operador/administrador
+\item[Respuesta] JobAcceptedResponse
+\end{description}
+Registra un trabajo asincrono de explicabilidad Eigen-CAM. Acepta una imagen y parametros de foco, valida que el metodo soportado sea Eigen-CAM y prepara capas objetivo, umbral, tamano de parche y bbox opcional antes de delegar el calculo al servicio XAI.
+
+
+\subsubsection*{DELETE /api/v1/jobs/\{job\_id\}}
+\begin{description}[leftmargin=2.8cm,style=nextline]
+\item[Handler] delete\_job
+\item[Acceso] usuario autenticado
+\item[Respuesta] DeleteJobResponse
+\end{description}
+Elimina del gestor un trabajo que ya no esta en ejecucion.
+
+
+\subsubsection*{GET /api/v1/jobs/\{job\_id\}}
+\begin{description}[leftmargin=2.8cm,style=nextline]
+\item[Handler] get\_job\_status
+\item[Acceso] usuario autenticado
+\item[Respuesta] JobStatusResponse
+\end{description}
+Consulta estado, progreso, error y resultado de un trabajo por identificador.
+
+
+\subsubsection*{GET /api/v1/model/info}
+\begin{description}[leftmargin=2.8cm,style=nextline]
+\item[Handler] model\_info
+\item[Acceso] usuario autenticado
+\item[Respuesta] ModelInfoResponse
+\end{description}
+Expone informacion operativa del modelo cargado y parametros por defecto.
+
+
+\subsubsection*{POST /api/v1/preview}
+\begin{description}[leftmargin=2.8cm,style=nextline]
+\item[Handler] generate\_preview
+\item[Acceso] usuario autenticado
+\item[Respuesta] PreviewImageResponse
+\end{description}
+Carga una imagen o GeoTIFF y devuelve previsualizacion junto con metadatos geoespaciales. Esta ruta permite al frontend mostrar la parcela antes de ejecutar el modelo. Para GeoTIFF conserva resolucion, CRS, transformacion afin, area, centro y fecha de adquisicion cuando estan disponibles.
+
+
+\subsubsection*{GET /api/v1/users}
+\begin{description}[leftmargin=2.8cm,style=nextline]
+\item[Handler] list\_users
+\item[Acceso] administrador
+\item[Respuesta] list[UserPublic]
+\end{description}
+Lista todos los usuarios registrados para la vista de administracion.
+
+
+\subsubsection*{POST /api/v1/users}
+\begin{description}[leftmargin=2.8cm,style=nextline]
+\item[Handler] create\_user
+\item[Acceso] administrador
+\item[Respuesta] UserPublic
+\end{description}
+Crea un usuario con rol operativo o administrativo.
+
+
+\subsubsection*{DELETE /api/v1/users/\{user\_id\}}
+\begin{description}[leftmargin=2.8cm,style=nextline]
+\item[Handler] delete\_user
+\item[Acceso] administrador
+\item[Respuesta] MessageResponse
+\end{description}
+Elimina un usuario impidiendo que un administrador se borre a si mismo.
+
+
+\subsubsection*{GET /api/v1/users/\{user\_id\}}
+\begin{description}[leftmargin=2.8cm,style=nextline]
+\item[Handler] get\_user
+\item[Acceso] administrador
+\item[Respuesta] UserPublic
+\end{description}
+Obtiene el detalle publico de un usuario gestionado.
+
+
+\subsubsection*{PATCH /api/v1/users/\{user\_id\}}
+\begin{description}[leftmargin=2.8cm,style=nextline]
+\item[Handler] update\_user
+\item[Acceso] administrador
+\item[Respuesta] UserPublic
+\end{description}
+Actualiza datos administrativos de un usuario existente.
+
+
+\subsubsection*{POST /api/v1/users/\{user\_id\}/reset-password}
+\begin{description}[leftmargin=2.8cm,style=nextline]
+\item[Handler] reset\_password
+\item[Acceso] administrador
+\item[Respuesta] MessageResponse
+\end{description}
+Restablece la contrasena de un usuario desde la administracion.
+
+
+
+\section{Servicios internos}
+\subsubsection*{Settings (class)}
+\noindent\textbf{Fichero:} \texttt{backend/app/core/config.py}\\
+Configuracion central de API, rutas de datos, modelo, trabajos y valores por defecto. Reune en una unica clase los parametros que condicionan el despliegue: prefijo de API, origen permitido para CORS, ubicacion de SQLite, carpeta de artefactos historicos, ruta del modelo YOLO, dispositivo de inferencia y valores por defecto usados en inferencia y explicabilidad.
+
+
+\subsubsection*{AuthService (class)}
+\noindent\textbf{Fichero:} \texttt{backend/app/services/auth\_service.py}\\
+Gestiona login, logout y validacion de tokens persistidos en base de datos.
+
+
+\subsubsection*{backend/app/services/gpkg\_export.py (module)}
+\noindent\textbf{Fichero:} \texttt{backend/app/services/gpkg\_export.py}\\
+Construcción de GeoPackage (.gpkg) con las detecciones georreferenciadas. Las detecciones llegan con `obb\_polygon` en coordenadas de píxel del TIFF original. Aplicamos la transformación afín de rasterio para llevar cada vértice a coordenadas del CRS del ortomosaico, y serializamos como capa de polígonos en un único GPKG. Este modulo es la frontera entre la salida del modelo, que trabaja en pixeles, y el resultado GIS que puede abrirse en herramientas externas como QGIS.
+
+
+\subsubsection*{build\_detections\_gpkg (function)}
+\noindent\textbf{Fichero:} \texttt{backend/app/services/gpkg\_export.py}\\
+Construye un GeoPackage en memoria a partir de detecciones OBB y metadatos CRS. Filtra detecciones por confianza, transforma vertices con la matriz afin del raster original, conserva atributos relevantes de cada marra y devuelve el fichero como bytes para descarga HTTP.
+
+
+\subsubsection*{LoadedImage (class)}
+\noindent\textbf{Fichero:} \texttt{backend/app/services/image\_service.py}\\
+Imagen RGB normalizada junto con metadatos raster y geoespaciales extraidos. Es el contrato interno que permite tratar de forma homogenea imagenes convencionales y ortomosaicos GeoTIFF. Incluye dimensiones, resolucion, unidad, CRS, transformacion afin, area aproximada, centro geografico y fecha de adquisicion cuando esa informacion esta disponible en el raster.
+
+
+\subsubsection*{load\_geotiff\_from\_bytes (function)}
+\noindent\textbf{Fichero:} \texttt{backend/app/services/image\_service.py}\\
+Lee un GeoTIFF desde memoria y extrae imagen RGB, resolucion, CRS y metadatos de parcela. Normaliza bandas raster a 8 bits para visualizacion e inferencia, conserva la transformacion pixel-CRS necesaria para exportar resultados y calcula metadatos agronomicos basicos como area aproximada y centro geografico.
+
+
+\subsubsection*{extract\_geotiff\_patch\_from\_bytes (function)}
+\noindent\textbf{Fichero:} \texttt{backend/app/services/image\_service.py}\\
+Extrae una ventana RGB de tamano fijo desde un GeoTIFF sin cargar todo el raster. Se usa en XAI para trabajar solo sobre el parche analizado, reduciendo memoria y manteniendo coherencia con imagenes geoespaciales grandes.
+
+
+\subsubsection*{load\_regular\_image\_from\_bytes (function)}
+\noindent\textbf{Fichero:} \texttt{backend/app/services/image\_service.py}\\
+Carga una imagen convencional con Pillow y asigna resolucion de pixel no georreferenciada.
+
+
+\subsubsection*{load\_image\_from\_upload (function)}
+\noindent\textbf{Fichero:} \texttt{backend/app/services/image\_service.py}\\
+Selecciona el cargador adecuado segun extension GeoTIFF o formato de imagen estandar.
+
+
+\subsubsection*{encode\_png\_base64 (function)}
+\noindent\textbf{Fichero:} \texttt{backend/app/services/image\_service.py}\\
+Codifica una imagen RGB como PNG base64 para respuestas JSON.
+
+
+\subsubsection*{encode\_preview\_jpeg (function)}
+\noindent\textbf{Fichero:} \texttt{backend/app/services/image\_service.py}\\
+Genera una previsualizacion JPEG reducida y codificada en base64.
+
+
+\subsubsection*{resize\_for\_preview (function)}
+\noindent\textbf{Fichero:} \texttt{backend/app/services/image\_service.py}\\
+Reduce una imagen manteniendo proporcion para uso interactivo en el frontend.
+
+
+\subsubsection*{calculate\_missing\_vines (function)}
+\noindent\textbf{Fichero:} \texttt{backend/app/services/inference\_service.py}\\
+Estima marras dividiendo la longitud fisica de la deteccion por el ancho tipico de cepa.
+
+
+\subsubsection*{InferenceService (class)}
+\noindent\textbf{Fichero:} \texttt{backend/app/services/inference\_service.py}\\
+Ejecuta deteccion por teselas, calcula metricas y persiste el analisis en historial. Recibe la imagen subida, normaliza su lectura con ImageService, divide la imagen en ventanas mediante SAHI y aplica el modelo YOLO para detectar marras. Convierte cada prediccion a una geometria OBB o bbox, calcula el numero estimado de cepas ausentes segun resolucion y ancho tipico, construye resumenes agregados y guarda resultado, previsualizacion y artefacto fuente para poder restaurar el analisis posteriormente.
+
+
+\subsubsection*{JobRecord (class)}
+\noindent\textbf{Fichero:} \texttt{backend/app/services/job\_manager.py}\\
+Estado serializable de un trabajo asincrono ejecutado por la API.
+
+
+\subsubsection*{JobManager (class)}
+\noindent\textbf{Fichero:} \texttt{backend/app/services/job\_manager.py}\\
+Ejecuta trabajos en segundo plano y conserva progreso, errores y resultados temporales. Desacopla las operaciones lentas de la peticion HTTP: las rutas crean un job, el worker procesa inferencia o XAI, y el frontend consulta el estado mediante polling. Incluye limpieza periodica para no mantener resultados temporales indefinidamente en memoria.
+
+
+\subsubsection*{ModelRegistry (class)}
+\noindent\textbf{Fichero:} \texttt{backend/app/services/model\_registry.py}\\
+Carga y reutiliza modelos YOLO, adaptador SAHI y modulos CAM segun la configuracion. La carga es perezosa para evitar inicializar modelos pesados hasta que una ruta los necesita. Expone un modelo Ultralytics directo para XAI, un modelo SAHI para inferencia por teselas y comprueba si la libreria local yolo\_cam esta disponible para generar mapas Eigen-CAM.
+
+
+\subsubsection*{StoredUser (class)}
+\noindent\textbf{Fichero:} \texttt{backend/app/services/user\_service.py}\\
+Representacion interna de usuario con hash de contrasena.
+
+
+\subsubsection*{UserService (class)}
+\noindent\textbf{Fichero:} \texttt{backend/app/services/user\_service.py}\\
+Administra usuarios, roles, autenticacion de credenciales y migracion inicial.
+
+
+\subsubsection*{XAIService (class)}
+\noindent\textbf{Fichero:} \texttt{backend/app/services/xai\_service.py}\\
+Genera explicabilidad Eigen-CAM sobre una imagen completa o una deteccion concreta. Selecciona una region de interes a partir del centro indicado, una bbox historica o la deteccion de mayor confianza. Extrae un parche consistente tambien para GeoTIFF, ejecuta el modelo YOLO y compone imagen original, anotacion y mapa de activacion para que el frontend pueda mostrar la explicabilidad sin recalcularla en el navegador.
+
+

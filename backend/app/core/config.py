@@ -4,6 +4,13 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
+    """Configuracion central de API, rutas de datos, modelo, trabajos y valores por defecto.
+
+    Reune en una unica clase los parametros que condicionan el despliegue:
+    prefijo de API, origen permitido para CORS, ubicacion de SQLite, carpeta de
+    artefactos historicos, ruta del modelo YOLO, dispositivo de inferencia y
+    valores por defecto usados en inferencia y explicabilidad.
+    """
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
     app_name: str = "VineDetect API"

@@ -17,6 +17,11 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+/**
+* Proporciona token de sesion, usuario autenticado y acciones de entrada y salida.
+* Al arrancar intenta recuperar el token almacenado, valida la sesion contra el
+* backend y sincroniza el cliente API con la cabecera Authorization.
+*/
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [status, setStatus] = useState<AuthStatus>("loading");
   const [token, setTokenState] = useState<string | null>(() => {
@@ -85,6 +90,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
+/** Devuelve el contexto de autenticacion actual y exige el uso dentro del proveedor. */
 export function useAuth(): AuthContextValue {
   const context = useContext(AuthContext);
   if (!context) throw new Error("useAuth debe usarse dentro de AuthProvider.");

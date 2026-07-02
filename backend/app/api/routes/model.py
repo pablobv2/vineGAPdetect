@@ -13,6 +13,7 @@ def model_info(
     request: Request,
     current_user: UserPublic = Depends(get_current_user),
 ) -> ModelInfoResponse:
+    """Expone informacion operativa del modelo cargado y parametros por defecto."""
     registry = request.app.state.model_registry
     xai_methods = ["eigencam"] if registry.yolo_cam_available else []
     return ModelInfoResponse(

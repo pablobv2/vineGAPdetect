@@ -17,6 +17,7 @@ function formatDate(iso: string | null | undefined) {
   return new Date(iso).toLocaleString("es-ES", { dateStyle: "short", timeStyle: "short" });
 }
 
+/** Pantalla administrativa para listar, editar, desactivar, borrar y reiniciar contrasenas. */
 export function AdminUsersPage() {
   const { status } = useAuth();
   const navigate = useNavigate();

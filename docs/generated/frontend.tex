@@ -1,0 +1,139 @@
+\chapter{Frontend}
+
+
+\section{Rutas React}
+\begin{description}[leftmargin=2.8cm,style=nextline]
+\item[/] LoginPage
+\item[/dashboard] ProtectedDashboard
+\item[/history] HistoryPage
+\item[/admin/users] AdminUsersPage
+\item[/admin/users/:userId] AdminUsersPage
+\item[/admin/users/new] AdminUserCreatePage
+\end{description}
+
+\section{Componentes y módulos documentados}
+\subsubsection*{App (function)}
+\noindent\textbf{Fichero:} \texttt{frontend/src/app/App.tsx}\\
+Compone autenticacion, estado del dashboard y enrutado principal de la aplicacion web. El arbol raiz garantiza que todas las pantallas accedan a la sesion activa y al estado compartido del analisis sin duplicar logica entre rutas.
+
+
+\subsubsection*{AuthProvider (function)}
+\noindent\textbf{Fichero:} \texttt{frontend/src/app/auth/AuthContext.tsx}\\
+Proporciona token de sesion, usuario autenticado y acciones de entrada y salida. Al arrancar intenta recuperar el token almacenado, valida la sesion contra el backend y sincroniza el cliente API con la cabecera Authorization.
+
+
+\subsubsection*{useAuth (function)}
+\noindent\textbf{Fichero:} \texttt{frontend/src/app/auth/AuthContext.tsx}\\
+Devuelve el contexto de autenticacion actual y exige el uso dentro del proveedor.
+
+
+\subsubsection*{createInferenceJob (function)}
+\noindent\textbf{Fichero:} \texttt{frontend/src/app/api/client.ts}\\
+Envia una imagen al backend y crea un job asincrono de deteccion de marras. Empaqueta archivo y parametros agronomicos en multipart/form-data para que FastAPI pueda procesar imagenes grandes sin bloquear la interfaz.
+
+
+\subsubsection*{generatePreview (function)}
+\noindent\textbf{Fichero:} \texttt{frontend/src/app/api/client.ts}\\
+Solicita la previsualizacion y metadatos de una imagen antes de ejecutar la inferencia.
+
+
+\subsubsection*{createXaiJob (function)}
+\noindent\textbf{Fichero:} \texttt{frontend/src/app/api/client.ts}\\
+Crea un job Eigen-CAM sobre la imagen cargada y una region opcional de interes. Permite fijar capa objetivo, umbral, tamano de parche y coordenadas o bbox de foco para explicar una deteccion concreta.
+
+
+\subsubsection*{createHistoryXaiJob (function)}
+\noindent\textbf{Fichero:} \texttt{frontend/src/app/api/client.ts}\\
+Regenera XAI desde una entrada de historial que conserva el artefacto fuente.
+
+
+\subsubsection*{getJob (function)}
+\noindent\textbf{Fichero:} \texttt{frontend/src/app/api/client.ts}\\
+Consulta estado y resultado de un job validando previamente su identificador UUID.
+
+
+\subsubsection*{getHistory (function)}
+\noindent\textbf{Fichero:} \texttt{frontend/src/app/api/client.ts}\\
+Recupera el listado de analisis historicos visibles para el usuario.
+
+
+\subsubsection*{getHistoryItem (function)}
+\noindent\textbf{Fichero:} \texttt{frontend/src/app/api/client.ts}\\
+Recupera el detalle de un analisis historico para restaurarlo en el dashboard.
+
+
+\subsubsection*{exportDetectionsGpkg (function)}
+\noindent\textbf{Fichero:} \texttt{frontend/src/app/api/client.ts}\\
+Descarga un GeoPackage construido a partir de detecciones y transformacion geoespacial. Solo se invoca cuando la inferencia conserva CRS y matriz afin del GeoTIFF, porque esos datos son necesarios para transformar pixeles a coordenadas GIS.
+
+
+\subsubsection*{DashboardStateProvider (function)}
+\noindent\textbf{Fichero:} \texttt{frontend/src/app/hooks/DashboardStateContext.tsx}\\
+Comparte el estado del flujo de analisis entre paneles y lo reinicia al cerrar sesion.
+
+
+\subsubsection*{useDashboardStateContext (function)}
+\noindent\textbf{Fichero:} \texttt{frontend/src/app/hooks/DashboardStateContext.tsx}\\
+Devuelve el contexto de estado usado por la pantalla principal de analisis.
+
+
+\subsubsection*{getDefaultXaiLayers (function)}
+\noindent\textbf{Fichero:} \texttt{frontend/src/app/hooks/useDashboardState.ts}\\
+Devuelve la capa por defecto usada para Eigen-CAM en el modelo entrenado.
+
+
+\subsubsection*{useDashboardState (function)}
+\noindent\textbf{Fichero:} \texttt{frontend/src/app/hooks/useDashboardState.ts}\\
+Centraliza el estado del dashboard: imagen, metadatos, inferencia, XAI, historial y errores. Coordina subida de archivo, generacion de previsualizacion, creacion de jobs, polling de resultados, restauracion desde historial, seleccion de deteccion para XAI y limpieza de URLs temporales del navegador.
+
+
+\subsubsection*{useJobPolling (function)}
+\noindent\textbf{Fichero:} \texttt{frontend/src/app/hooks/useJobPolling.ts}\\
+Consulta periodicamente un job del backend hasta completarse o fallar y expone su progreso.
+
+
+\subsubsection*{Dashboard (function)}
+\noindent\textbf{Fichero:} \texttt{frontend/src/app/components/Dashboard.tsx}\\
+Orquesta el flujo principal: carga de imagen, inferencia, XAI, filtros y exportaciones. Conecta el estado global con los paneles visuales, recalcula marras segun el ancho de cepa elegido por el usuario y habilita exportacion PDF/GPKG cuando existen detecciones y metadatos suficientes.
+
+
+\subsubsection*{InferenceCanvasHandle (interface)}
+\noindent\textbf{Fichero:} \texttt{frontend/src/app/components/InferenceCanvas.tsx}\\
+API imperativa usada por la barra de herramientas para controlar zoom y encuadre.
+
+
+\subsubsection*{InferenceCanvas (const)}
+\noindent\textbf{Fichero:} \texttt{frontend/src/app/components/InferenceCanvas.tsx}\\
+Visualiza la imagen analizada, superpone XAI y dibuja detecciones OBB con OpenLayers. Crea una proyeccion en coordenadas de pixel, representa la imagen como capa estatica, dibuja poligonos o cajas de deteccion y comunica escala y numero de entidades visibles al resto del dashboard.
+
+
+\subsubsection*{HistoryPage (function)}
+\noindent\textbf{Fichero:} \texttt{frontend/src/app/components/HistoryPage.tsx}\\
+Muestra analisis guardados y permite restaurarlos en el dashboard con sus metadatos. La pantalla recupera resumenes historicos, ordena resultados, borra registros y reconstruye el estado necesario para inspeccionar detecciones sin repetir la inferencia.
+
+
+\subsubsection*{ProtectedDashboard (function)}
+\noindent\textbf{Fichero:} \texttt{frontend/src/app/components/ProtectedDashboard.tsx}\\
+Protege la ruta del dashboard y redirige usuarios anonimos al inicio de sesion.
+
+
+\subsubsection*{AdminUsersPage (function)}
+\noindent\textbf{Fichero:} \texttt{frontend/src/app/components/admin/UsersPage.tsx}\\
+Pantalla administrativa para listar, editar, desactivar, borrar y reiniciar contrasenas.
+
+
+\subsubsection*{AdminUserCreatePage (function)}
+\noindent\textbf{Fichero:} \texttt{frontend/src/app/components/admin/UserCreatePage.tsx}\\
+Formulario administrativo para crear usuarios con rol y estado inicial.
+
+
+\subsubsection*{PdfReportData (interface)}
+\noindent\textbf{Fichero:} \texttt{frontend/src/app/utils/exportPdf.ts}\\
+Datos necesarios para construir el informe PDF local del analisis mostrado.
+
+
+\subsubsection*{generatePdfReport (function)}
+\noindent\textbf{Fichero:} \texttt{frontend/src/app/utils/exportPdf.ts}\\
+Genera en el navegador un PDF con metadatos, metricas e imagen anotada del analisis. El informe se construye localmente con jsPDF para no enviar de nuevo datos al backend y usa una imagen reducida con detecciones pintadas segun confianza.
+
+

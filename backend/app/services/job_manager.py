@@ -16,6 +16,7 @@ JobHandler = Callable[[dict, ProgressCallback], dict]
 
 @dataclass
 class JobRecord:
+    """Estado serializable de un trabajo asincrono ejecutado por la API."""
     job_id: str
     job_type: JobType
     status: JobStatus = JobStatus.queued
@@ -35,6 +36,13 @@ class _JobRequest:
 
 
 class JobManager:
+    """Ejecuta trabajos en segundo plano y conserva progreso, errores y resultados temporales.
+
+    Desacopla las operaciones lentas de la peticion HTTP: las rutas crean un
+    job, el worker procesa inferencia o XAI, y el frontend consulta el estado
+    mediante polling. Incluye limpieza periodica para no mantener resultados
+    temporales indefinidamente en memoria.
+    """
     def __init__(self, cleanup_seconds: int, cleanup_interval_seconds: int = 60) -> None:
         self.cleanup_seconds = cleanup_seconds
         self.cleanup_interval_seconds = cleanup_interval_seconds

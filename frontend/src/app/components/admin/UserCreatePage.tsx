@@ -10,6 +10,7 @@ const ROLE_LABELS: Record<UserRole, string> = {
   operator: "Operario",
 };
 
+/** Formulario administrativo para crear usuarios con rol y estado inicial. */
 export function AdminUserCreatePage() {
   const navigate = useNavigate();
   const [username, setUsername] = useState("");

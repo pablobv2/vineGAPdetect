@@ -92,6 +92,7 @@ async function prepareImage(
   });
 }
 
+/** Datos necesarios para construir el informe PDF local del analisis mostrado. */
 export interface PdfReportData {
   fileName: string;
   parcelMeta: ParcelMetadata | null;
@@ -106,6 +107,11 @@ export interface PdfReportData {
   confThreshold: number;
 }
 
+/**
+* Genera en el navegador un PDF con metadatos, metricas e imagen anotada del analisis.
+* El informe se construye localmente con jsPDF para no enviar de nuevo datos al
+* backend y usa una imagen reducida con detecciones pintadas segun confianza.
+*/
 export async function generatePdfReport(data: PdfReportData): Promise<void> {
   const { fileName, parcelMeta, detections, metrics, imageUrl, confThreshold } = data;
 

@@ -29,6 +29,12 @@ warnings.filterwarnings('ignore', category=UserWarning)
 # --- CONFIGURACIÓN Y CLASES DE DATOS ---
 @dataclass
 class PatcherConfig:
+    """Parametros reproducibles para convertir rasteres y vectores en dataset YOLO-OBB.
+
+    Define origen de datos, destino, tamano de parche, solape, particiones
+    train/validation/test, clase objetivo y reglas de filtrado. Es la unidad de
+    configuracion que permite repetir la generacion del dataset experimental.
+    """
     raster_dir: Path
     vector_dir: Path
     output_dir: Path
@@ -58,6 +64,7 @@ class PatcherConfig:
 
 @dataclass
 class PatcherStats:
+    """Acumula contadores y tiempos del proceso de generacion de parches."""
     total_patches: int = 0
     total_objects: int = 0
     objects_per_class: Dict[str, int] = field(default_factory=dict)
@@ -224,6 +231,12 @@ def process_parcel_to_patches(task_data: Tuple) -> Dict[str, Any]:
 
 # --- CLASE ORQUESTADORA ---
 class YoloPatcher:
+    """Orquesta lectura geoespacial, particionado train/validation/test y escritura YOLO-OBB.
+
+    Relaciona ortomosaicos con capas vectoriales, detecta clases disponibles,
+    reparte parcelas entre particiones, procesa parches en paralelo y genera la
+    estructura de imagenes, etiquetas y reportes que consume Ultralytics.
+    """
     def __init__(self, config: PatcherConfig, logger: logging.Logger):
         self.cfg, self.log, self.stats = config, logger, PatcherStats()
         self.class_map = {}

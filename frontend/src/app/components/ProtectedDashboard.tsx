@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import { useAuth } from "../auth/AuthContext";
 import { Dashboard } from "./Dashboard";
 
+/** Protege la ruta del dashboard y redirige usuarios anonimos al inicio de sesion. */
 export function ProtectedDashboard() {
   const { status } = useAuth();
   const navigate = useNavigate();

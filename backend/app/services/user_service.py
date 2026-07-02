@@ -18,6 +18,7 @@ from app.schemas.auth import CreateUserRequest, UpdateUserRequest, UserPublic, U
 
 @dataclass
 class StoredUser:
+    """Representacion interna de usuario con hash de contrasena."""
     id: str
     username: str
     full_name: str
@@ -71,6 +72,7 @@ def _to_public(row: UserModel) -> UserPublic:
 # Service
 
 class UserService:
+    """Administra usuarios, roles, autenticacion de credenciales y migracion inicial."""
     def __init__(
         self,
         session_factory: sessionmaker,

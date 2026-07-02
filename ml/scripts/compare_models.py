@@ -10,7 +10,7 @@ Comparación sistemática:
 - Tamaños de parche: 256, 320, 416, 512, 640
 
 Uso:
-    python scripts/compare_models.py
+python scripts/compare_models.py
 
 Los resultados se guardan en results/vineGAPdetect_Training/ con nombres descriptivos.
 Al finalizar, genera un reporte comparativo en results/comparison_report.csv
@@ -121,7 +121,7 @@ def generate_dataset(patch_size: int, output_dir: str) -> Dict[str, Any]:
     Genera un dataset con el tamaño de parche especificado.
 
     Returns:
-        Dict con información del resultado
+    Dict con información del resultado
     """
     logger.info("\n" + "="*70)
     logger.info(f"GENERANDO DATASET: Parches de {patch_size}x{patch_size} px")
@@ -196,10 +196,10 @@ def validate_dataset(dataset_path: Path) -> bool:
 
 def run_training(config: Dict[str, Any], dataset_dir: str) -> Dict[str, Any]:
     """
-    Lanza un entrenamiento con la configuración especificada.
+    Ejecuta un entrenamiento con la configuración especificada.
 
     Returns:
-        Dict con información del resultado (success, duration, metrics, etc.)
+    Dict con información del resultado (success, duration, metrics, etc.)
     """
     logger.info("\n" + "="*70)
     logger.info(f"INICIANDO: {config['name']}")

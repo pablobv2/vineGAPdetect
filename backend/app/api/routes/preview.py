@@ -14,6 +14,12 @@ async def generate_preview(
     file: UploadFile = File(...),
     current_user: UserPublic = Depends(get_current_user),
 ) -> PreviewImageResponse:
+    """Carga una imagen o GeoTIFF y devuelve previsualizacion junto con metadatos geoespaciales.
+
+    Esta ruta permite al frontend mostrar la parcela antes de ejecutar el modelo.
+    Para GeoTIFF conserva resolucion, CRS, transformacion afin, area, centro y
+    fecha de adquisicion cuando estan disponibles.
+    """
     content = await file.read()
     if not content:
         raise HTTPException(status_code=400, detail="Archivo vacío.")

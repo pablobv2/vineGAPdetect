@@ -9,6 +9,12 @@ from yolo_cam.utils.model_targets import ClassifierOutputTarget, YOLOBoxScoreTar
 from .utils.image import scale_cam_image
 
 class BaseCAM:
+    """Base comun para generar mapas CAM sobre modelos YOLO usados en deteccion.
+
+    Gestiona hooks de activacion y gradiente, escalado de mapas, suavizado y
+    agregacion multicapa. Las implementaciones Eigen-CAM y Grad-CAM especializan
+    el calculo de pesos o proyecciones sobre esta infraestructura comun.
+    """
     def __init__(self,
                  model: torch.nn.Module,
                  target_layers: List[torch.nn.Module],
@@ -49,7 +55,7 @@ class BaseCAM:
         except Exception:
             return 0
         return int(getattr(head, "ne", 0) or 0)
-        
+
     """ Get a vector of weights for every channel in the target layer.
         Methods that return weights channels,
         will typically need to only implement this function. """

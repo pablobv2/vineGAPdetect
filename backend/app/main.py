@@ -1,3 +1,12 @@
+"""Punto de entrada de la API FastAPI de vineGAPdetect.
+
+El modulo compone la aplicacion backend: inicializa la base de datos SQLite,
+crea los servicios de usuarios, autenticacion, gestion de jobs, inferencia y
+explicabilidad, configura CORS para el frontend y registra todas las rutas bajo
+el prefijo de API. El ciclo de vida inicia el worker de trabajos al arrancar y
+lo detiene al cerrar la aplicacion.
+"""
+
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI

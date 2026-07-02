@@ -121,6 +121,14 @@ def _pad_to_stride(image_rgb: np.ndarray, stride: int = 32) -> tuple[np.ndarray,
 
 
 class XAIService:
+    """Genera explicabilidad Eigen-CAM sobre una imagen completa o una deteccion concreta.
+
+    Selecciona una region de interes a partir del centro indicado, una bbox
+    historica o la deteccion de mayor confianza. Extrae un parche consistente
+    tambien para GeoTIFF, ejecuta el modelo YOLO y compone imagen original,
+    anotacion y mapa de activacion para que el frontend pueda mostrar la
+    explicabilidad sin recalcularla en el navegador.
+    """
     def __init__(self, model_registry: ModelRegistry) -> None:
         self.model_registry = model_registry
 

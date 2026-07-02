@@ -44,6 +44,12 @@ function fmtBytes(bytes: number): string {
   return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
 }
 
+/**
+* Muestra analisis guardados y permite restaurarlos en el dashboard con sus metadatos.
+* La pantalla recupera resumenes historicos, ordena resultados, borra registros
+* y reconstruye el estado necesario para inspeccionar detecciones sin repetir
+* la inferencia.
+*/
 export function HistoryPage() {
   const { status, user } = useAuth();
   const navigate = useNavigate();

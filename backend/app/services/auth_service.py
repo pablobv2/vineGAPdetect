@@ -12,6 +12,7 @@ from app.services.user_service import UserService
 
 
 class AuthService:
+    """Gestiona login, logout y validacion de tokens persistidos en base de datos."""
     def __init__(
         self,
         user_service: UserService,

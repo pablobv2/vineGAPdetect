@@ -60,6 +60,12 @@ async def create_inference_job(
     slice_size: int = Form(settings.default_slice_size),
     current_user: UserPublic = Depends(require_operator_or_admin),
 ) -> JobAcceptedResponse:
+    """Registra un trabajo asincrono de inferencia YOLO sobre la imagen subida.
+
+    Valida tamano y disponibilidad del modelo, conserva parametros de corte por
+    teselas, umbral de confianza, solape y ancho tipico de cepa, y delega la
+    ejecucion en JobManager para que el frontend consulte progreso sin bloquear.
+    """
     content = await _read_upload_or_400(file)
 
     if not request.app.state.model_registry.is_model_available():
@@ -108,6 +114,12 @@ async def create_xai_job(
     focus_confidence: float | None = Form(None),
     current_user: UserPublic = Depends(require_operator_or_admin),
 ) -> JobAcceptedResponse:
+    """Registra un trabajo asincrono de explicabilidad Eigen-CAM.
+
+    Acepta una imagen y parametros de foco, valida que el metodo soportado sea
+    Eigen-CAM y prepara capas objetivo, umbral, tamano de parche y bbox opcional
+    antes de delegar el calculo al servicio XAI.
+    """
     content = await _read_upload_or_400(file)
     method_normalized = method.strip().lower()
     scope_normalized = xai_scope.strip().lower()
@@ -162,6 +174,7 @@ def get_job_status(
     job_id: str,
     current_user: UserPublic = Depends(get_current_user),
 ) -> JobStatusResponse:
+    """Consulta estado, progreso, error y resultado de un trabajo por identificador."""
     record = request.app.state.job_manager.get(job_id)
     if record is None:
         raise HTTPException(status_code=404, detail="Job no encontrado.")
@@ -185,6 +198,7 @@ def delete_job(
     job_id: str,
     current_user: UserPublic = Depends(get_current_user),
 ) -> DeleteJobResponse:
+    """Elimina del gestor un trabajo que ya no esta en ejecucion."""
     deleted = request.app.state.job_manager.delete(job_id)
     if not deleted:
         record = request.app.state.job_manager.get(job_id)

@@ -12,6 +12,13 @@ from app.core.config import Settings, settings
 
 
 class ModelRegistry:
+    """Carga y reutiliza modelos YOLO, adaptador SAHI y modulos CAM segun la configuracion.
+
+    La carga es perezosa para evitar inicializar modelos pesados hasta que una
+    ruta los necesita. Expone un modelo Ultralytics directo para XAI, un modelo
+    SAHI para inferencia por teselas y comprueba si la libreria local yolo_cam
+    esta disponible para generar mapas Eigen-CAM.
+    """
     def __init__(self, cfg: Settings = settings) -> None:
         self.cfg = cfg
         self._yolo_model: YOLO | None = None

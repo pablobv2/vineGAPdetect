@@ -3,6 +3,8 @@
 Las detecciones llegan con `obb_polygon` en coordenadas de píxel del TIFF original.
 Aplicamos la transformación afín de rasterio para llevar cada vértice a coordenadas
 del CRS del ortomosaico, y serializamos como capa de polígonos en un único GPKG.
+Este modulo es la frontera entre la salida del modelo, que trabaja en pixeles,
+y el resultado GIS que puede abrirse en herramientas externas como QGIS.
 """
 from __future__ import annotations
 
@@ -25,6 +27,12 @@ def build_detections_gpkg(
     parcel_name: str | None = None,
     conf_threshold: float = 0.0,
 ) -> bytes:
+    """Construye un GeoPackage en memoria a partir de detecciones OBB y metadatos CRS.
+
+    Filtra detecciones por confianza, transforma vertices con la matriz afin
+    del raster original, conserva atributos relevantes de cada marra y devuelve
+    el fichero como bytes para descarga HTTP.
+    """
     if not transform or len(transform) != 6:
         raise ValueError(
             "Falta la transformación afín del ortomosaico. "

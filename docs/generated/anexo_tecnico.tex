@@ -1,0 +1,26 @@
+\documentclass[11pt,a4paper]{report}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{fontspec}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{titlesec}
+\setmainfont{Latin Modern Roman}
+\renewcommand{\contentsname}{Índice}
+\renewcommand{\chaptername}{Capítulo}
+\sloppy
+\emergencystretch=4em
+\setlength{\LTpre}{0.6em}
+\setlength{\LTpost}{1em}
+\title{Anexo técnico}
+\author{vineGAPdetect}
+\date{}
+\begin{document}
+\maketitle
+\tableofcontents
+\newpage
+\input{frontend.tex}
+\input{backend.tex}
+\input{ml.tex}
+\end{document}

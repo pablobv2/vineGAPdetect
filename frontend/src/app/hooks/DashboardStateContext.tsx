@@ -7,6 +7,7 @@ type DashboardStateContextValue = ReturnType<typeof useDashboardState>;
 
 const DashboardStateContext = createContext<DashboardStateContextValue | null>(null);
 
+/** Comparte el estado del flujo de analisis entre paneles y lo reinicia al cerrar sesion. */
 export function DashboardStateProvider({ children }: { children: React.ReactNode }) {
   const value = useDashboardState();
   const { status } = useAuth();
@@ -26,6 +27,7 @@ export function DashboardStateProvider({ children }: { children: React.ReactNode
   );
 }
 
+/** Devuelve el contexto de estado usado por la pantalla principal de analisis. */
 export function useDashboardStateContext(): DashboardStateContextValue {
   const value = useContext(DashboardStateContext);
   if (!value) {

@@ -87,6 +87,11 @@ export async function resetManagedUserPassword(userId: string, newPassword: stri
 export async function deleteManagedUser(userId: string): Promise<void> {
   await request<{ detail: string }>(`/users/${userId}`, { method: "DELETE" });
 }
+/**
+* Envia una imagen al backend y crea un job asincrono de deteccion de marras.
+* Empaqueta archivo y parametros agronomicos en multipart/form-data para que
+* FastAPI pueda procesar imagenes grandes sin bloquear la interfaz.
+*/
 export async function createInferenceJob(file: File, options?: { confidenceThreshold?: number; displayConfidenceThreshold?: number; overlapRatio?: number; vineWidth?: number; sliceSize?: number }): Promise<JobAcceptedResponse> {
   const form = new FormData();
   form.append("file", file);
@@ -97,11 +102,17 @@ export async function createInferenceJob(file: File, options?: { confidenceThres
   form.append("slice_size", String(options?.sliceSize ?? 640));
   return assertJobAccepted(await request<unknown>("/jobs/inference", { method: "POST", body: form }));
 }
+/** Solicita la previsualizacion y metadatos de una imagen antes de ejecutar la inferencia. */
 export async function generatePreview(file: File): Promise<PreviewImageResponse> {
   const form = new FormData();
   form.append("file", file);
   return request<PreviewImageResponse>("/preview", { method: "POST", body: form });
 }
+/**
+* Crea un job Eigen-CAM sobre la imagen cargada y una region opcional de interes.
+* Permite fijar capa objetivo, umbral, tamano de parche y coordenadas o bbox de
+* foco para explicar una deteccion concreta.
+*/
 export async function createXaiJob(file: File, options: {
   method: "eigencam";
   scope?: "patch" | "full";
@@ -127,6 +138,7 @@ export async function createXaiJob(file: File, options: {
   return assertJobAccepted(await request<unknown>("/jobs/xai", { method: "POST", body: form }));
 }
 
+/** Regenera XAI desde una entrada de historial que conserva el artefacto fuente. */
 export async function createHistoryXaiJob(historyId: number, options: {
   method: "eigencam";
   scope?: "patch" | "full";
@@ -146,15 +158,18 @@ export async function createHistoryXaiJob(historyId: number, options: {
   }
   return assertJobAccepted(await request<unknown>(`/history/${historyId}/xai`, { method: "POST", body: form }));
 }
+/** Consulta estado y resultado de un job validando previamente su identificador UUID. */
 export async function getJob<T = Record<string, unknown>>(jobId: string): Promise<JobStatusResponse<T>> {
   if (!isUuid(jobId)) throw new Error(`job_id inválido: ${jobId}`);
   return request<JobStatusResponse<T>>(`/jobs/${jobId}`, { method: "GET" });
 }
 
+/** Recupera el listado de analisis historicos visibles para el usuario. */
 export async function getHistory(limit = 200): Promise<AnalysisHistoryItem[]> {
   return request<AnalysisHistoryItem[]>(`/history?limit=${limit}`, { method: "GET" });
 }
 
+/** Recupera el detalle de un analisis historico para restaurarlo en el dashboard. */
 export async function getHistoryItem(id: number): Promise<AnalysisHistoryDetail> {
   return request<AnalysisHistoryDetail>(`/history/${id}`, { method: "GET" });
 }
@@ -179,6 +194,11 @@ export interface ExportDetectionPayload {
   estimated_missing_vines: number;
 }
 
+/**
+* Descarga un GeoPackage construido a partir de detecciones y transformacion geoespacial.
+* Solo se invoca cuando la inferencia conserva CRS y matriz afin del GeoTIFF,
+* porque esos datos son necesarios para transformar pixeles a coordenadas GIS.
+*/
 export async function exportDetectionsGpkg(payload: {
   detections: ExportDetectionPayload[];
   transform: number[];

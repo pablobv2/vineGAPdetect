@@ -14,6 +14,13 @@ from rasterio.warp import transform
 
 @dataclass
 class LoadedImage:
+    """Imagen RGB normalizada junto con metadatos raster y geoespaciales extraidos.
+
+    Es el contrato interno que permite tratar de forma homogenea imagenes
+    convencionales y ortomosaicos GeoTIFF. Incluye dimensiones, resolucion,
+    unidad, CRS, transformacion afin, area aproximada, centro geografico y fecha
+    de adquisicion cuando esa informacion esta disponible en el raster.
+    """
     image_rgb: np.ndarray
     file_type: str
     resolution_x: float
@@ -123,6 +130,12 @@ def _to_wgs84_center(crs, center_x: float, center_y: float) -> tuple[float | Non
 
 
 def load_geotiff_from_bytes(content: bytes) -> LoadedImage:
+    """Lee un GeoTIFF desde memoria y extrae imagen RGB, resolucion, CRS y metadatos de parcela.
+
+    Normaliza bandas raster a 8 bits para visualizacion e inferencia, conserva
+    la transformacion pixel-CRS necesaria para exportar resultados y calcula
+    metadatos agronomicos basicos como area aproximada y centro geografico.
+    """
     with MemoryFile(content) as memfile:
         with memfile.open() as src:
             data = src.read(list(range(1, min(src.count, 3) + 1)))
@@ -180,6 +193,11 @@ def load_geotiff_from_bytes(content: bytes) -> LoadedImage:
 
 
 def extract_geotiff_patch_from_bytes(content: bytes, x_off: int, y_off: int, patch_size: int) -> np.ndarray:
+    """Extrae una ventana RGB de tamano fijo desde un GeoTIFF sin cargar todo el raster.
+
+    Se usa en XAI para trabajar solo sobre el parche analizado, reduciendo
+    memoria y manteniendo coherencia con imagenes geoespaciales grandes.
+    """
     with MemoryFile(content) as memfile:
         with memfile.open() as src:
             channels = min(src.count, 3)
@@ -204,6 +222,7 @@ def extract_geotiff_patch_from_bytes(content: bytes, x_off: int, y_off: int, pat
 
 
 def load_regular_image_from_bytes(content: bytes) -> LoadedImage:
+    """Carga una imagen convencional con Pillow y asigna resolucion de pixel no georreferenciada."""
     unsupported_format = _detect_iso_image_format(content)
     if unsupported_format:
         raise ValueError(
@@ -236,12 +255,14 @@ def load_regular_image_from_bytes(content: bytes) -> LoadedImage:
 
 
 def load_image_from_upload(content: bytes, filename: str) -> LoadedImage:
+    """Selecciona el cargador adecuado segun extension GeoTIFF o formato de imagen estandar."""
     if is_geotiff_filename(filename):
         return load_geotiff_from_bytes(content)
     return load_regular_image_from_bytes(content)
 
 
 def encode_png_base64(image_rgb: np.ndarray) -> str:
+    """Codifica una imagen RGB como PNG base64 para respuestas JSON."""
     image_bgr = cv2.cvtColor(image_rgb, cv2.COLOR_RGB2BGR)
     ok, buffer = cv2.imencode(".png", image_bgr)
     if not ok:
@@ -250,7 +271,7 @@ def encode_png_base64(image_rgb: np.ndarray) -> str:
 
 
 def encode_preview_jpeg(image_rgb: np.ndarray, max_side: int = 800, quality: int = 75) -> str:
-    """Downscale and encode as JPEG base64 (for compact storage in history)."""
+    """Genera una previsualizacion JPEG reducida y codificada en base64."""
     small = resize_for_preview(image_rgb, max_side=max_side)
     pil_img = Image.fromarray(small)
     buf = io.BytesIO()
@@ -259,6 +280,7 @@ def encode_preview_jpeg(image_rgb: np.ndarray, max_side: int = 800, quality: int
 
 
 def resize_for_preview(image_rgb: np.ndarray, max_side: int = 1920) -> np.ndarray:
+    """Reduce una imagen manteniendo proporcion para uso interactivo en el frontend."""
     height, width = image_rgb.shape[:2]
     longest = max(width, height)
     if longest <= max_side:

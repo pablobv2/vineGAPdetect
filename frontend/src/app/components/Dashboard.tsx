@@ -75,6 +75,12 @@ function recalculateMissingVines(detection: DetectionItem, imageMeta: ImageMeta 
   return { ...detection, estimated_missing_vines: estimatedMissing };
 }
 
+/**
+* Orquesta el flujo principal: carga de imagen, inferencia, XAI, filtros y exportaciones.
+* Conecta el estado global con los paneles visuales, recalcula marras segun el
+* ancho de cepa elegido por el usuario y habilita exportacion PDF/GPKG cuando
+* existen detecciones y metadatos suficientes.
+*/
 export function Dashboard() {
   const { user } = useAuth();
   const { state, actions } = useDashboardStateContext();

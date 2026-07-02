@@ -5,6 +5,7 @@ from yolo_cam.utils.svd_on_activations import get_2d_projection
 
 
 class EigenCAM(BaseCAM):
+    """Implementa Eigen-CAM usando la proyeccion principal de las activaciones."""
     def __init__(self, model, target_layers, task: str = 'od', #use_cuda=False,
                  reshape_transform=None):
         super(EigenCAM, self).__init__(model,

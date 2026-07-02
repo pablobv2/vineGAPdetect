@@ -3,8 +3,7 @@ import torch
 
 
 class ActivationsAndGradients:
-    """ Class for extracting activations and
-    registering gradients from targetted intermediate layers """
+    """Extrae activaciones y registra gradientes de capas intermedias seleccionadas."""
 
     def __init__(self, model, target_layers, reshape_transform):
         self.model = model

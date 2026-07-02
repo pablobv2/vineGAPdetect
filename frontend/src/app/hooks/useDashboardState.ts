@@ -8,6 +8,7 @@ export type ViewMode = "preview" | "inference" | "xai";
 export type XAIMethod = "eigencam";
 export type XAIScope = "full";
 
+/** Devuelve la capa por defecto usada para Eigen-CAM en el modelo entrenado. */
 export function getDefaultXaiLayers(): number[] { return [18]; }
 
 export type ParcelMetadata = {
@@ -49,6 +50,12 @@ function getImageDimensions(src: string): Promise<{ width: number; height: numbe
   });
 }
 
+/**
+* Centraliza el estado del dashboard: imagen, metadatos, inferencia, XAI, historial y errores.
+* Coordina subida de archivo, generacion de previsualizacion, creacion de jobs,
+* polling de resultados, restauracion desde historial, seleccion de deteccion
+* para XAI y limpieza de URLs temporales del navegador.
+*/
 export function useDashboardState() {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [displayFilename, setDisplayFilename] = useState<string | null>(null);

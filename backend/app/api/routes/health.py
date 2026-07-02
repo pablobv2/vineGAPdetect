@@ -8,6 +8,7 @@ router = APIRouter()
 
 @router.get("/health", response_model=HealthResponse)
 def health(request: Request) -> HealthResponse:
+    """Informa del estado de la API, el dispositivo configurado y la disponibilidad del modelo."""
     registry = request.app.state.model_registry
     return HealthResponse(
         status="ok",

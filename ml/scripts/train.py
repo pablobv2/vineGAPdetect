@@ -4,15 +4,15 @@ Script de Entrenamiento para Modelos YOLOv11-OBB - vineGAPdetect
 Detección de Marras con Oriented Bounding Boxes
 
 Uso básico:
-    python scripts/train.py --dataset-dir ./data/datasets/yolo_marras
+python scripts/train.py --dataset-dir ./data/datasets/yolo_marras
 
 Uso avanzado:
-    python scripts/train.py \
-        --dataset-dir ./data/datasets/yolo_marras \
-        --model models/pretrained/yolo11l-obb.pt \
-        --epochs 100 \
-        --batch 16 \
-        --name experimento_v1
+python scripts/train.py \
+--dataset-dir ./data/datasets/yolo_marras \
+--model models/pretrained/yolo11l-obb.pt \
+--epochs 100 \
+--batch 16 \
+--name experimento_v1
 """
 import os
 import sys

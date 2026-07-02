@@ -125,6 +125,7 @@ def calculate_missing_vines(
     typical_vine_width: float,
     obb_polygon: list[list[float]] | None = None,
 ) -> int:
+    """Estima marras dividiendo la longitud fisica de la deteccion por el ancho tipico de cepa."""
     if obb_polygon:
         oriented_length = _longest_polygon_side_m(obb_polygon, resolution_x, resolution_y)
         if oriented_length is not None:
@@ -149,6 +150,15 @@ def _summarize_detections(detections: list[dict[str, Any]]) -> dict[str, Any]:
 
 
 class InferenceService:
+    """Ejecuta deteccion por teselas, calcula metricas y persiste el analisis en historial.
+
+    Recibe la imagen subida, normaliza su lectura con ImageService, divide la
+    imagen en ventanas mediante SAHI y aplica el modelo YOLO para detectar
+    marras. Convierte cada prediccion a una geometria OBB o bbox, calcula el
+    numero estimado de cepas ausentes segun resolucion y ancho tipico, construye
+    resumenes agregados y guarda resultado, previsualizacion y artefacto fuente
+    para poder restaurar el analisis posteriormente.
+    """
     def __init__(
         self,
         model_registry: ModelRegistry,

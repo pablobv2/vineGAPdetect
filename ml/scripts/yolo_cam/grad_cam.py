@@ -2,6 +2,7 @@ import numpy as np
 from yolo_cam.base_cam import BaseCAM
 
 class GradCAM(BaseCAM):
+    """Implementa Grad-CAM ponderando activaciones con gradientes medios por canal."""
     def __init__(self, model, target_layers, task: str = 'od', reshape_transform=None):
         # Grad-CAM necesita los gradientes, así que nos aseguramos de que uses_gradients sea True.
         # La clase BaseCAM ya lo hace por defecto, así que solo llamamos al constructor padre.

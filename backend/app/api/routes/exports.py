@@ -24,6 +24,12 @@ def export_detections_gpkg(
     payload: ExportDetectionsRequest,
     current_user: UserPublic = Depends(get_current_user),
 ) -> Response:
+    """Genera un GeoPackage con las detecciones georreferenciadas del analisis.
+
+    Recibe detecciones filtradas, CRS y transformacion afin del GeoTIFF original,
+    convierte poligonos OBB de pixeles a coordenadas reales y devuelve un
+    fichero GPKG descargable para uso en software GIS.
+    """
     try:
         data = build_detections_gpkg(
             detections=[det.model_dump() for det in payload.detections],

@@ -1,0 +1,69 @@
+\chapter{Módulo ML}
+
+
+\section{Pipeline experimental y librería de explicabilidad}
+\subsubsection*{ml/configs/dataset\_config.py (module)}
+\noindent\textbf{Fichero:} \texttt{ml/configs/dataset\_config.py}\\
+Configuración centralizada del pipeline ML de vineGAPdetect. Pensada para ser portable: - Usa rutas relativas al directorio `ml/` por defecto. - Permite sobrescribir las rutas principales mediante variables de entorno.
+
+
+\subsubsection*{ml/scripts/generar\_parches.py (module)}
+\noindent\textbf{Fichero:} \texttt{ml/scripts/generar\_parches.py}\\
+Script de creación de parches y etiquetas YOLOv11-OBB. Este script permite generar un dataset para entrenar un modelo que detecte una única clase de interés y filtrar artefactos en los bordes.
+
+
+\subsubsection*{PatcherConfig (class)}
+\noindent\textbf{Fichero:} \texttt{ml/scripts/generar\_parches.py}\\
+Parametros reproducibles para convertir rasteres y vectores en dataset YOLO-OBB. Define origen de datos, destino, tamano de parche, solape, particiones train/validation/test, clase objetivo y reglas de filtrado. Es la unidad de configuracion que permite repetir la generacion del dataset experimental.
+
+
+\subsubsection*{PatcherStats (class)}
+\noindent\textbf{Fichero:} \texttt{ml/scripts/generar\_parches.py}\\
+Acumula contadores y tiempos del proceso de generacion de parches.
+
+
+\subsubsection*{YoloPatcher (class)}
+\noindent\textbf{Fichero:} \texttt{ml/scripts/generar\_parches.py}\\
+Orquesta lectura geoespacial, particionado train/validation/test y escritura YOLO-OBB. Relaciona ortomosaicos con capas vectoriales, detecta clases disponibles, reparte parcelas entre particiones, procesa parches en paralelo y genera la estructura de imagenes, etiquetas y reportes que consume Ultralytics.
+
+
+\subsubsection*{ml/scripts/train.py (module)}
+\noindent\textbf{Fichero:} \texttt{ml/scripts/train.py}\\
+Script de Entrenamiento para Modelos YOLOv11-OBB - vineGAPdetect Detección de Marras con Oriented Bounding Boxes Uso básico: python scripts/train.py --dataset-dir ./data/datasets/yolo\_marras Uso avanzado: python scripts/train.py --dataset-dir ./data/datasets/yolo\_marras --model models/pretrained/yolo11l-obb.pt --epochs 100 --batch 16 --name experimento\_v1
+
+
+\subsubsection*{ml/scripts/compare\_models.py (module)}
+\noindent\textbf{Fichero:} \texttt{ml/scripts/compare\_models.py}\\
+Script de Comparación de Configuraciones - vineGAPdetect Ejecuta múltiples entrenamientos con diferentes tamaños de parche y modelos. Objetivo: Determinar el tamaño óptimo de parche para detección de marras. Comparación sistemática: - Modelos: nano (rápido) y large (preciso) - Tamaños de parche: 256, 320, 416, 512, 640 Uso: python scripts/compare\_models.py Los resultados se guardan en results/vineGAPdetect\_Training/ con nombres descriptivos. Al finalizar, genera un reporte comparativo en results/comparison\_report.csv
+
+
+\subsubsection*{ml/scripts/evaluate\_on\_test.py (module)}
+\noindent\textbf{Fichero:} \texttt{ml/scripts/evaluate\_on\_test.py}\\
+Script de Evaluación en Test Set - vineGAPdetect Valida todos los modelos best.pt en el conjunto de TEST (no validación). Esto proporciona métricas imparciales del rendimiento real de cada modelo. Uso: python scripts/evaluate\_on\_test.py
+
+
+\subsubsection*{ml/scripts/explainability\_cam.py (module)}
+\noindent\textbf{Fichero:} \texttt{ml/scripts/explainability\_cam.py}\\
+Script de Explicabilidad (XAI) para Modelos YOLOv11-OBB - vineGAPdetect. Genera visualizaciones offline con Eigen-CAM o Grad-CAM sobre imágenes de entrada para documentar el comportamiento del modelo fuera de la app web.
+
+
+\subsubsection*{BaseCAM (class)}
+\noindent\textbf{Fichero:} \texttt{ml/scripts/yolo\_cam/base\_cam.py}\\
+Base comun para generar mapas CAM sobre modelos YOLO usados en deteccion. Gestiona hooks de activacion y gradiente, escalado de mapas, suavizado y agregacion multicapa. Las implementaciones Eigen-CAM y Grad-CAM especializan el calculo de pesos o proyecciones sobre esta infraestructura comun.
+
+
+\subsubsection*{EigenCAM (class)}
+\noindent\textbf{Fichero:} \texttt{ml/scripts/yolo\_cam/eigen\_cam.py}\\
+Implementa Eigen-CAM usando la proyeccion principal de las activaciones.
+
+
+\subsubsection*{GradCAM (class)}
+\noindent\textbf{Fichero:} \texttt{ml/scripts/yolo\_cam/grad\_cam.py}\\
+Implementa Grad-CAM ponderando activaciones con gradientes medios por canal.
+
+
+\subsubsection*{ActivationsAndGradients (class)}
+\noindent\textbf{Fichero:} \texttt{ml/scripts/yolo\_cam/activations\_and\_gradients.py}\\
+Extrae activaciones y registra gradientes de capas intermedias seleccionadas.
+
+

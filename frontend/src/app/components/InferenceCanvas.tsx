@@ -30,6 +30,7 @@ interface Props {
   overlayOpacity?: number;
 }
 
+/** API imperativa usada por la barra de herramientas para controlar zoom y encuadre. */
 export interface InferenceCanvasHandle {
   zoomIn: () => void;
   zoomOut: () => void;
@@ -135,6 +136,12 @@ function createDetectionFeature(detection: DetectionItem, imageWidth: number, im
   return feature;
 }
 
+/**
+* Visualiza la imagen analizada, superpone XAI y dibuja detecciones OBB con OpenLayers.
+* Crea una proyeccion en coordenadas de pixel, representa la imagen como capa
+* estatica, dibuja poligonos o cajas de deteccion y comunica escala y numero
+* de entidades visibles al resto del dashboard.
+*/
 export const InferenceCanvas = forwardRef<InferenceCanvasHandle, Props>(function InferenceCanvas(
   { imageUrl, overlayUrl, detections, sourceWidth, sourceHeight, showCount, showLabels = true, onScaleChange, onFeatureCountChange, overlayOpacity = 0.6 },
   ref,

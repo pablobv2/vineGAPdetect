@@ -11,12 +11,14 @@ router = APIRouter()
 
 @router.post("/login", response_model=SessionResponse)
 def login(request: Request, payload: LoginRequest) -> SessionResponse:
+    """Autentica un usuario y crea una sesion con token bearer."""
     token, expires_at, user = request.app.state.auth_service.login(payload.username, payload.password)
     return SessionResponse(access_token=token, expires_at=expires_at, user=user)
 
 
 @router.get("/me", response_model=UserPublic)
 def me(current_user: UserPublic = Depends(get_current_user)) -> UserPublic:
+    """Devuelve los datos publicos del usuario asociado al token actual."""
     return current_user
 
 
@@ -26,5 +28,6 @@ def logout(
     credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
     current_user: UserPublic = Depends(get_current_user),
 ) -> MessageResponse:
+    """Invalida la sesion activa y confirma el cierre al usuario."""
     request.app.state.auth_service.logout(credentials.credentials)
     return MessageResponse(detail=f"Sesión cerrada para {current_user.username}.")

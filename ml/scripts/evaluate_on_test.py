@@ -6,7 +6,7 @@ Valida todos los modelos best.pt en el conjunto de TEST (no validación).
 Esto proporciona métricas imparciales del rendimiento real de cada modelo.
 
 Uso:
-    python scripts/evaluate_on_test.py
+python scripts/evaluate_on_test.py
 """
 import json
 import logging
@@ -63,11 +63,11 @@ def validate_on_test(experiment_name: str, dataset_dir: str) -> Dict[str, float]
     Valida un modelo en el conjunto de TEST.
 
     Args:
-        experiment_name: Nombre del experimento
-        dataset_dir: Directorio del dataset
+    experiment_name: Nombre del experimento
+    dataset_dir: Directorio del dataset
 
     Returns:
-        Dict con métricas en test
+    Dict con métricas en test
     """
     best_model_path = TRAINING_RESULTS_DIR / experiment_name / "weights" / "best.pt"
 

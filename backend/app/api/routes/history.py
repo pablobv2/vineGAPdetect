@@ -187,6 +187,12 @@ def get_user_quota(
     request: Request,
     current_user: UserPublic = Depends(get_current_user),
 ) -> QuotaResponse:
+    """Devuelve el espacio usado y el limite de almacenamiento del usuario.
+
+    Calcula la cuota a partir de las parcelas guardadas en el historico y
+    permite al frontend bloquear nuevas conservaciones antes de superar el
+    maximo configurado para cada cuenta.
+    """
     session_factory = request.app.state.auth_service._sf
     with session_factory() as db:
         used = _get_used_bytes(db, current_user.id)
@@ -199,6 +205,12 @@ def get_history(
     limit: int = 200,
     current_user: UserPublic = Depends(get_current_user),
 ) -> list[AnalysisHistoryItem]:
+    """Lista analisis historicos visibles para el usuario autenticado.
+
+    Los administradores consultan todos los registros y los operarios solo los
+    suyos. La respuesta contiene resumenes, parametros usados y metadatos de
+    imagen suficientes para navegar y filtrar el historico.
+    """
     session_factory = request.app.state.auth_service._sf
 
     with session_factory() as db:
@@ -221,6 +233,7 @@ def delete_history_item(
     history_id: int,
     current_user: UserPublic = Depends(get_current_user),
 ) -> None:
+    """Borra un analisis historico y su artefacto fuente si existe."""
     session_factory = request.app.state.auth_service._sf
     with session_factory() as db:
         row = db.query(AnalysisHistory).filter(AnalysisHistory.id == history_id).first()
@@ -243,6 +256,12 @@ def save_history_item(
     history_id: int,
     current_user: UserPublic = Depends(get_current_user),
 ) -> SaveParcelResponse:
+    """Marca una inferencia historica como parcela guardada del usuario.
+
+    Verifica permisos, evita duplicados por hash o metadatos de fichero,
+    comprueba la cuota disponible y conserva el registro para que aparezca en
+    Mis parcelas sin duplicar el artefacto fuente.
+    """
     session_factory = request.app.state.auth_service._sf
     with session_factory() as db:
         row = db.query(AnalysisHistory).filter(AnalysisHistory.id == history_id).first()
@@ -294,6 +313,12 @@ def create_history_xai_job(
     imgsz: int = Form(settings.default_xai_imgsz),
     current_user: UserPublic = Depends(get_current_user),
 ) -> JobAcceptedResponse:
+    """Crea un trabajo XAI reutilizando la imagen original guardada en el historial.
+
+    Recupera el artefacto fuente persistido, selecciona la deteccion indicada o
+    la mejor segun umbral, calcula su centro y lanza un job Eigen-CAM enfocado
+    sobre esa marra sin repetir la inferencia completa.
+    """
     session_factory = request.app.state.auth_service._sf
     with session_factory() as db:
         row = db.query(AnalysisHistory).filter(AnalysisHistory.id == history_id).first()
@@ -366,6 +391,12 @@ def get_history_item(
     history_id: int,
     current_user: UserPublic = Depends(get_current_user),
 ) -> AnalysisHistoryDetail:
+    """Recupera detalle, previsualizacion, resultado y XAI almacenados de un analisis.
+
+    Devuelve la informacion necesaria para restaurar el dashboard: imagen
+    previsualizada, JSON de detecciones, parametros de ejecucion, metadatos
+    geoespaciales y mapa XAI precalculado si existe.
+    """
     session_factory = request.app.state.auth_service._sf
 
     with session_factory() as db:

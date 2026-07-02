@@ -211,7 +211,7 @@ export function LoginPage() {
             </form>
 
             <div style={{ marginTop: 36, paddingTop: 16, borderTop: "1px solid var(--vg-line)", fontSize: 11, color: "var(--vg-ink-lo)", lineHeight: 1.6 }}>
-              El acceso lo gestiona el administrador de la organizaci?n.
+              El acceso lo gestiona el administrador de la organización.
               Roles disponibles:{" "}
               <span style={{ color: "var(--vg-ink-md)" }}>operario</span>,{" "}
               <span style={{ color: "var(--vg-ink-md)" }}>administrador</span>.

@@ -131,7 +131,7 @@ export function CenterViewer({
                   <span style={{ fontFamily: "var(--vg-mono)", fontSize: 10.5, letterSpacing: "0.12em", textTransform: "uppercase" }}>Empieza aquí</span>
                 </div>
                 <h3 style={{ fontSize: 17, fontWeight: 500, letterSpacing: "-0.02em", margin: "0 0 5px" }}>
-                  Carga de ortomosaico para an?lisis
+                  Carga de ortomosaico para análisis
                 </h3>
                 <p style={{ color: "var(--vg-ink-md)", fontSize: 12, lineHeight: 1.5, maxWidth: 460, margin: 0 }}>
                   GeoTIFF / TIFF / PNG / JPG. Los mosaicos pueden pesar varios GB — la vista previa
@@ -220,7 +220,7 @@ export function CenterViewer({
             )}
             {!xaiRunning && !xaiDone && isHistoryRestored && (
               <div style={{ maxWidth: 620, margin: "0 auto", textAlign: "center", color: "var(--vg-ink-md)", fontSize: 13, lineHeight: 1.55 }}>
-                Esta parcela restaurada necesita regenerar XAI desde el GeoTIFF guardado. El modo XAI inicia el c?lculo.
+                Esta parcela restaurada necesita regenerar XAI desde el GeoTIFF guardado. El modo XAI inicia el cálculo.
               </div>
             )}
             {!xaiRunning && !xaiDone && !isHistoryRestored && (

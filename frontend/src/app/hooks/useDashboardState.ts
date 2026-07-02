@@ -17,7 +17,7 @@ export type ParcelMetadata = {
   crs?: string | null; areaHectares?: number | null;
   centerLat?: number | null; centerLon?: number | null;
   acquisitionDate?: string | null; fileType?: string;
-  /** Scale factor from original image → stored preview (set only when restored from history). */
+  /** Scale factor from original image -> stored preview (set only when restored from history). */
   previewScale?: number;
   previewScaleX?: number;
   previewScaleY?: number;

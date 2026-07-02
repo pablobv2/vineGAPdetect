@@ -1,4 +1,4 @@
-FROM python:3.11-slim
+﻿FROM python:3.11-slim
 
 WORKDIR /app
 
@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         curl \
     && rm -rf /var/lib/apt/lists/*
 
-# PyTorch + torchvision CPU (deben instalarse juntos desde el índice CPU
+# PyTorch + torchvision CPU (deben instalarse juntos desde el ?ndice CPU
 # para garantizar compatibilidad de versiones; si se instalan por separado,
 # ultralytics descarga torchvision desde PyPI con ruedas CUDA incompatibles).
 RUN pip install --no-cache-dir torch torchvision \
@@ -23,17 +23,18 @@ COPY backend/requirements.txt /tmp/requirements.txt
 RUN grep -vE "^(torch|torchvision)" /tmp/requirements.txt \
     | pip install --no-cache-dir -r /dev/stdin
 
-# Código fuente
+# C?digo fuente
 COPY backend/ ./backend/
 COPY ml/scripts/ ./ml/scripts/
 
-# Estos directorios se rellenan en tiempo de ejecución mediante volúmenes.
+# Estos directorios se rellenan en tiempo de ejecuci?n mediante vol?menes.
 RUN mkdir -p ml/models/trained backend/data
 
 EXPOSE 8000
 
 # Igual que en desarrollo local: ejecutar desde backend/ con "app.main:app".
-# config.py usa parents[3] desde backend/app/core/config.py → /app (repo root),
-# así que las rutas de modelo y datos siguen resolviendo correctamente.
+# config.py usa parents[3] desde backend/app/core/config.py -> /app (repo root),
+# as? que las rutas de modelo y datos siguen resolviendo correctamente.
 WORKDIR /app/backend
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+

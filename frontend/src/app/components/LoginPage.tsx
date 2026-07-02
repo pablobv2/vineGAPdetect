@@ -50,7 +50,7 @@ export function LoginPage() {
   return (
     <div style={{ width: "100%", height: "100%", display: "flex", overflow: "hidden", fontFamily: "var(--vg-font)", color: "var(--vg-ink-hi)" }}>
 
-      {/* ── Left: image pane ── */}
+      {/* Left: image pane */}
       <div style={{ flex: "0 0 60%", position: "relative", overflow: "hidden" }}>
         {/* Photo — light theme */}
         <img
@@ -137,7 +137,7 @@ export function LoginPage() {
         </div>
       </div>
 
-      {/* ── Right: form pane ── */}
+      {/* Right: form pane */}
       <div style={{
         flex: "0 0 40%", display: "flex", flexDirection: "column",
         background: "var(--vg-bg)", overflow: "auto",
@@ -196,7 +196,7 @@ export function LoginPage() {
                 autoComplete="current-password"
                 required
                 disabled={loading}
-                placeholder="••••••••••"
+                placeholder="********"
                 style={{ width: "100%", boxSizing: "border-box" }}
               />
 
@@ -211,7 +211,7 @@ export function LoginPage() {
             </form>
 
             <div style={{ marginTop: 36, paddingTop: 16, borderTop: "1px solid var(--vg-line)", fontSize: 11, color: "var(--vg-ink-lo)", lineHeight: 1.6 }}>
-              El acceso lo gestiona el administrador de tu organización.
+              El acceso lo gestiona el administrador de la organizaci?n.
               Roles disponibles:{" "}
               <span style={{ color: "var(--vg-ink-md)" }}>operario</span>,{" "}
               <span style={{ color: "var(--vg-ink-md)" }}>administrador</span>.

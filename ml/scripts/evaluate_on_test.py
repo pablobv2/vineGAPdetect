@@ -30,13 +30,7 @@ TRAINING_RESULTS_DIR = RESULTS_DIR / "vineGAPdetect_Training"
 
 def print_banner():
     """Imprime banner de inicio."""
-    banner = """
-    ╔════════════════════════════════════════════════════════════╗
-    ║       vineGAPdetect - Evaluación en Conjunto de Test          ║
-    ║          Métricas Imparciales de Modelos Entrenados       ║
-    ╚════════════════════════════════════════════════════════════╝
-    """
-    print(banner)
+    print("vineGAPdetect - evaluacion en test")
 
 
 def extract_metrics(results: Any) -> Dict[str, float]:
@@ -96,15 +90,15 @@ def validate_on_test(experiment_name: str, dataset_dir: str) -> Dict[str, float]
     }
 
     if not best_model_path.exists():
-        logger.warning(f"  ⚠ Modelo best.pt no encontrado para {experiment_name}")
+        logger.warning(f"  AVISO Modelo best.pt no encontrado para {experiment_name}")
         return metrics
 
     if not dataset_yaml.exists():
-        logger.warning(f"  ⚠ Dataset YAML no encontrado: {dataset_yaml}")
+        logger.warning(f"  AVISO Dataset YAML no encontrado: {dataset_yaml}")
         return metrics
 
     if not test_images_dir.exists():
-        logger.warning(f"  ⚠ Directorio test no encontrado: {test_images_dir}")
+        logger.warning(f"  AVISO Directorio test no encontrado: {test_images_dir}")
         return metrics
 
     try:
@@ -113,7 +107,7 @@ def validate_on_test(experiment_name: str, dataset_dir: str) -> Dict[str, float]
         metrics['Test_Images'] = len(test_images)
 
         if len(test_images) == 0:
-            logger.warning(f"  ⚠ No hay imágenes en test para {experiment_name}")
+            logger.warning(f"  AVISO No hay imágenes en test para {experiment_name}")
             return metrics
 
         # Cargar modelo
@@ -123,17 +117,17 @@ def validate_on_test(experiment_name: str, dataset_dir: str) -> Dict[str, float]
         logger.info(f"  Validando {experiment_name} en TEST ({len(test_images)} imágenes)...")
         results = model.val(
             data=str(dataset_yaml),
-            split='test',  # ← Importante: usar split test
+            split='test',  # <- Importante: usar split test
             batch=8,
             verbose=False
         )
 
         metrics.update(extract_metrics(results))
 
-        logger.info(f"    ✓ mAP@50-95: {metrics['mAP@50-95']:.4f}")
+        logger.info(f"    [OK] mAP@50-95: {metrics['mAP@50-95']:.4f}")
 
     except Exception as e:
-        logger.warning(f"  ✗ Error validando {experiment_name}: {e}")
+        logger.warning(f"  [ERROR] Error validando {experiment_name}: {e}")
 
     return metrics
 
@@ -146,13 +140,13 @@ def main():
 
     if not partial_path.exists():
         logger.error(f"No se encontró {partial_path}")
-        logger.error("Ejecuta primero: python scripts/compare_models.py")
+        logger.error("Falta ejecutar previamente: python scripts/compare_models.py")
         return
 
     with open(partial_path, 'r') as f:
         results = json.load(f)
 
-    logger.info(f"✓ Cargados {len(results)} resultados\n")
+    logger.info(f"[OK] Cargados {len(results)} resultados\n")
 
     # Filtrar solo entrenamientos exitosos
     training_results = [r for r in results if 'config' in r and r.get('success')]
@@ -230,7 +224,7 @@ def main():
             best_idx = valid_df['mAP@50-95'].idxmax()
             best = df.iloc[best_idx]
 
-            logger.info(f"\n🏆 MEJOR MODELO EN TEST (mAP@50-95):")
+            logger.info(f"\n MEJOR MODELO EN TEST (mAP@50-95):")
             logger.info(f"  Experimento: {best['Experimento']}")
             logger.info(f"  Modelo: {best['Modelo']}")
             logger.info(f"  Tamaño Parche: {best['Tamaño Parche']}")
@@ -252,7 +246,7 @@ def main():
                 logger.info(f"  Large - mAP@50-95 promedio: {avg_large:.4f}")
 
     logger.info("\n" + "="*70)
-    logger.info("✓ EVALUACIÓN COMPLETADA")
+    logger.info("[OK] EVALUACIÓN COMPLETADA")
     logger.info("="*70)
     logger.info(f"\nResultados guardados en:")
     logger.info(f"  - CSV: {output_path}")

@@ -2,7 +2,7 @@ import { jsPDF } from "jspdf";
 import type { DetectionItem } from "../api/types";
 import type { ParcelMetadata } from "../hooks/useDashboardState";
 
-// ── Brand palette (light theme tokens) ─────────────────────────────
+// Brand palette (light theme tokens)
 const ACCENT      : [number,number,number] = [110, 138,  62]; // #6E8A3E
 const ACCENT_SOFT : [number,number,number] = [230, 237, 210]; // #DDE3C7 approx
 const WHITE       : [number,number,number] = [255, 255, 255];
@@ -12,8 +12,8 @@ const INK_HI      : [number,number,number] = [ 19,  17,  12]; // #13110C
 const INK_LO      : [number,number,number] = [117, 112, 106]; // #75706A
 const LINE        : [number,number,number] = [215, 210, 197]; // #D7D2C5
 
-// ── Confidence colour scale ──────────────────────────────────────────
-// Exact same thresholds and hex values as InferenceCanvas.tsx → getColor().
+// Confidence colour scale
+// Exact same thresholds and hex values as InferenceCanvas.tsx -> getColor().
 const CONF_HIGH : [number,number,number] = [255,  51,  51]; // #ff3333 — ≥ 60 %
 const CONF_MED  : [number,number,number] = [255, 136,   0]; // #ff8800 — 40–60 %
 const CONF_LOW  : [number,number,number] = [234, 179,   8]; // #eab308 — < 40 %
@@ -115,7 +115,7 @@ export async function generatePdfReport(data: PdfReportData): Promise<void> {
   const CW = W - ML * 2; // 170 mm
   let y    = 0;
 
-  // ── Helpers ─────────────────────────────────────────────────────
+  // Helpers
   const sectionLabel = (text: string, yPos: number) => {
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(7);
@@ -131,7 +131,7 @@ export async function generatePdfReport(data: PdfReportData): Promise<void> {
     if (y + needed > 277) { pdf.addPage(); y = 20; }
   };
 
-  // ── HEADER ──────────────────────────────────────────────────────
+  // HEADER
   pdf.setFillColor(...ACCENT);
   pdf.rect(0, 0, W, 38, "F");
 
@@ -158,7 +158,7 @@ export async function generatePdfReport(data: PdfReportData): Promise<void> {
 
   y = 48;
 
-  // ── METADATA ────────────────────────────────────────────────────
+  // METADATA
   sectionLabel("Información de la parcela", y);
   y += 6;
 
@@ -200,7 +200,7 @@ export async function generatePdfReport(data: PdfReportData): Promise<void> {
 
   y += numMDRows * 9 + 10;
 
-  // ── RESULTS SUMMARY ─────────────────────────────────────────────
+  // RESULTS SUMMARY
   newPageIfNeeded(42);
   sectionLabel("Resultados del análisis", y);
   y += 5;
@@ -242,7 +242,7 @@ export async function generatePdfReport(data: PdfReportData): Promise<void> {
 
   y += tileH + 10;
 
-  // ── PREVIEW IMAGE WITH DETECTIONS ───────────────────────────────
+  // PREVIEW IMAGE WITH DETECTIONS
   if (imageUrl) {
     const prepared = await prepareImage(imageUrl, 1400, detections.length > 0 ? {
       detections,
@@ -271,7 +271,7 @@ export async function generatePdfReport(data: PdfReportData): Promise<void> {
       pdf.addImage(prepared.dataUrl, "JPEG", imgX, y, pdfImgW, pdfImgH);
       y += pdfImgH + GAP_AFTER_IMG;
 
-      // ── Confidence legend ──────────────────────────────────────
+      // Confidence legend
       const legendItems: [string, [number,number,number]][] = [
         ["Alta confianza (>= 60 %)",  CONF_HIGH],
         ["Confianza media (40-60 %)", CONF_MED],
@@ -294,7 +294,7 @@ export async function generatePdfReport(data: PdfReportData): Promise<void> {
     }
   }
 
-  // ── FOOTER on every page ────────────────────────────────────────
+  // FOOTER on every page
   const totalPages = pdf.getNumberOfPages();
   for (let p = 1; p <= totalPages; p++) {
     pdf.setPage(p);
@@ -307,7 +307,7 @@ export async function generatePdfReport(data: PdfReportData): Promise<void> {
     pdf.text(`Página ${p} / ${totalPages}`, W - ML, 293.5, { align: "right" });
   }
 
-  // ── SAVE ────────────────────────────────────────────────────────
+  // SAVE
   const safeName = fileName.replace(/\.[^.]+$/, "").replace(/[^a-zA-Z0-9_\-]/g, "_");
   pdf.save(`${safeName}_informe_marras.pdf`);
 }

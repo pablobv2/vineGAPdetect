@@ -1,36 +1,65 @@
+﻿# General
+.DS_Store
+Thumbs.db
+*.log
+.env
+.env.*
+!.env.example
+.vscode/
+.idea/
+.agents/
+.codex/
+.claude/
+.cursor/
+
 # Python
 __pycache__/
 *.py[cod]
-*.pyo
+*$py.class
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
 .venv/
 venv/
+env/
 
-# Node / frontend
-node_modules/
+# Node
+frontend/node_modules/
 frontend/dist/
-dist/
-build/
+frontend/dist-ssr/
+frontend/.vite/
+frontend/.eslintcache
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
 
-# Local data and generated artifacts
-backend/data/
-ml/data/raw/*
+# Backend runtime data
+backend/data/*
+!backend/data/.gitkeep
+
+# ML data and artifacts
+ml/data/raw/**
+!ml/data/raw/
 !ml/data/raw/.gitkeep
-!ml/data/raw/*/
-!ml/data/raw/*/.gitkeep
-ml/data/datasets/*
+!ml/data/raw/rasters/
+!ml/data/raw/rasters/.gitkeep
+!ml/data/raw/vectors/
+!ml/data/raw/vectors/.gitkeep
+ml/data/datasets/**
+!ml/data/datasets/
 !ml/data/datasets/.gitkeep
-ml/models/pretrained/*
-!ml/models/pretrained/.gitkeep
-ml/models/trained/*
-!ml/models/trained/.gitkeep
-ml/results/*
+ml/results/**
+!ml/results/
 !ml/results/.gitkeep
-*.pt
-*.pth
-*.weights
+ml/models/pretrained/**
+!ml/models/pretrained/
+!ml/models/pretrained/.gitkeep
+ml/models/trained/**
+!ml/models/trained/
+!ml/models/trained/.gitkeep
+
+# Common geospatial and ML artifacts
 *.tif
 *.tiff
 *.gpkg
@@ -38,18 +67,12 @@ ml/results/*
 *.shx
 *.dbf
 *.prj
-
-# Logs and accidental output
-*.log
-backend/=2.0.0
+*.pt
+*.pth
+*.ckpt
+*.onnx
+*.h5
+*.hdf5
 runs/
-VidVision_Training/
-yolo_dataset*/
-
-# OS / editor metadata
-.DS_Store
-Thumbs.db
-*.swp
-*.swo
-*~
-*:Zone.Identifier
+wandb/
+mlruns/

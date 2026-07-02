@@ -14,7 +14,7 @@ from app.db.models import UserModel
 from app.schemas.auth import CreateUserRequest, UpdateUserRequest, UserPublic, UserRole
 
 
-# ── Internal representation (keeps AuthService unchanged) ───────────
+# Internal representation (keeps AuthService unchanged)
 
 @dataclass
 class StoredUser:
@@ -68,7 +68,7 @@ def _to_public(row: UserModel) -> UserPublic:
     )
 
 
-# ── Service ─────────────────────────────────────────────────────────
+# Service
 
 class UserService:
     def __init__(
@@ -79,7 +79,7 @@ class UserService:
         self._sf = session_factory
         self._ensure_users(legacy_users_file)
 
-    # ── Public read API ─────────────────────────────────────────────
+    # Public read API
 
     def list_users(self) -> list[UserPublic]:
         with self._sf() as db:
@@ -104,7 +104,7 @@ class UserService:
             row = db.get(UserModel, user_id)
             return _to_stored(row) if row else None
 
-    # ── Auth ────────────────────────────────────────────────────────
+    # Auth
 
     def authenticate(self, username: str, password: str) -> UserPublic:
         user = self.get_by_username(username)
@@ -116,7 +116,7 @@ class UserService:
         if not user.is_active:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="El usuario está desactivado. Contacte con un administrador.",
+                detail="El usuario esta desactivado.",
             )
         now = datetime.utcnow()
         with self._sf() as db:
@@ -129,7 +129,7 @@ class UserService:
         user.updated_at = now
         return user.to_public()
 
-    # ── Write API ───────────────────────────────────────────────────
+    # Write API
 
     def create_user(self, payload: CreateUserRequest) -> UserPublic:
         username = payload.username.strip()
@@ -212,7 +212,7 @@ class UserService:
             db.commit()
             return stored
 
-    # ── Bootstrap / migration ────────────────────────────────────────
+    # Bootstrap / migration
 
     def _ensure_users(self, legacy_file: Path | None) -> None:
         with self._sf() as db:

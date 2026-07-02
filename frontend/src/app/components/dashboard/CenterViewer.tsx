@@ -56,12 +56,12 @@ export function CenterViewer({
     if (file) onFileProcess(file);
   };
 
-  // ── Empty / loading state ──
+  // Empty / loading state
   if (!imageUrl) {
     return (
       <main style={{ flex: 1, display: "flex", flexDirection: "column", padding: "28px 36px 24px", gap: 22, overflow: "auto", background: "var(--vg-bg)", minWidth: 0 }}>
 
-        {/* ── Hero header ── */}
+        {/* Hero header */}
         <div style={{ maxWidth: 760 }}>
           <div style={{ fontFamily: "var(--vg-mono)", fontSize: 10.5, color: "var(--vg-accent)", letterSpacing: "0.16em", textTransform: "uppercase", marginBottom: 8 }}>
             vineGAPdetect · análisis vitícola
@@ -86,7 +86,7 @@ export function CenterViewer({
           </div>
         ) : (
           <>
-            {/* ── Pipeline overview ── */}
+            {/* Pipeline overview */}
             <div style={{
               display: "grid",
               gridTemplateColumns: "repeat(3, 1fr)",
@@ -115,7 +115,7 @@ export function CenterViewer({
               />
             </div>
 
-            {/* ── Drop zone ── */}
+            {/* Drop zone */}
             <div
               className={`drop-zone${isDragging ? " dragging" : ""}`}
               style={{ padding: "32px 36px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 40, minHeight: 170 }}
@@ -131,7 +131,7 @@ export function CenterViewer({
                   <span style={{ fontFamily: "var(--vg-mono)", fontSize: 10.5, letterSpacing: "0.12em", textTransform: "uppercase" }}>Empieza aquí</span>
                 </div>
                 <h3 style={{ fontSize: 17, fontWeight: 500, letterSpacing: "-0.02em", margin: "0 0 5px" }}>
-                  Arrastra un ortomosaico o haz clic para seleccionarlo
+                  Carga de ortomosaico para an?lisis
                 </h3>
                 <p style={{ color: "var(--vg-ink-md)", fontSize: 12, lineHeight: 1.5, maxWidth: 460, margin: 0 }}>
                   GeoTIFF / TIFF / PNG / JPG. Los mosaicos pueden pesar varios GB — la vista previa
@@ -160,7 +160,7 @@ export function CenterViewer({
     );
   }
 
-  // ── XAI result view ──
+  // XAI result view
   if (viewMode === "xai") {
     return (
       <main style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0, overflow: "hidden", background: "var(--vg-bg)" }}>
@@ -220,7 +220,7 @@ export function CenterViewer({
             )}
             {!xaiRunning && !xaiDone && isHistoryRestored && (
               <div style={{ maxWidth: 620, margin: "0 auto", textAlign: "center", color: "var(--vg-ink-md)", fontSize: 13, lineHeight: 1.55 }}>
-                Esta parcela restaurada necesita regenerar XAI desde el GeoTIFF guardado. Cambia a XAI para iniciar el cálculo.
+                Esta parcela restaurada necesita regenerar XAI desde el GeoTIFF guardado. El modo XAI inicia el c?lculo.
               </div>
             )}
             {!xaiRunning && !xaiDone && !isHistoryRestored && (
@@ -234,7 +234,7 @@ export function CenterViewer({
     );
   }
 
-  // ── Image viewer (preview / inference) ──
+  // Image viewer (preview / inference)
   return (
     <main style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0, overflow: "hidden", background: "var(--vg-bg)" }}>
       <ViewerToolbar

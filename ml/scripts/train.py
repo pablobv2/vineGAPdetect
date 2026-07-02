@@ -41,13 +41,7 @@ TRAINING_RESULTS_DIR = RESULTS_DIR / "vineGAPdetect_Training"
 
 def print_banner():
     """Imprime banner de inicio del script."""
-    banner = """
-    ╔════════════════════════════════════════════════════════════╗
-    ║       vineGAPdetect - Entrenamiento Modelo Detección Marras   ║
-    ║                    YOLOv11-OBB Training                    ║
-    ╚════════════════════════════════════════════════════════════╝
-    """
-    print(banner)
+    print("vineGAPdetect - entrenamiento YOLOv11-OBB")
 
 
 def check_environment() -> Dict[str, str]:
@@ -114,7 +108,7 @@ def get_class_map(dataset_dir: Path) -> dict:
     if not report_path.exists():
         raise FileNotFoundError(
             f"No se encontró {report_path}\n"
-            "Debes ejecutar 'python scripts/generar_parches.py' primero."
+            "Falta ejecutar previamente 'python scripts/generar_parches.py'."
         )
 
     with open(report_path, 'r') as f:
@@ -296,9 +290,9 @@ Ejemplos:
                         cfg = json.load(f)
                         timestamp = cfg.get('timestamp', 'N/A')
                         epochs = cfg.get('hyperparameters', {}).get('epochs', 'N/A')
-                        print(f"  • {exp} (Creado: {timestamp[:19]}, Épocas: {epochs})")
+                        print(f"  - {exp} (Creado: {timestamp[:19]}, Épocas: {epochs})")
                 else:
-                    print(f"  • {exp}")
+                    print(f"  - {exp}")
         else:
             print("\nNo se encontraron experimentos existentes.")
 
@@ -317,7 +311,7 @@ Ejemplos:
 
     if not ds_path.exists():
         logger.error(f"El directorio del dataset no existe: {ds_path}")
-        logger.error("Ejecuta primero: python scripts/generar_parches.py")
+        logger.error("Falta ejecutar previamente: python scripts/generar_parches.py")
         sys.exit(1)
 
     is_valid, msg = validate_dataset(ds_path)
@@ -325,7 +319,7 @@ Ejemplos:
         logger.error(f"Dataset inválido: {msg}")
         sys.exit(1)
 
-    logger.info(f"  ✓ {msg}")
+    logger.info(f"  [OK] {msg}")
 
     # Estadísticas del dataset
     stats = get_dataset_stats(ds_path)
@@ -336,7 +330,7 @@ Ejemplos:
     # Obtener mapa de clases
     try:
         class_map = get_class_map(ds_path)
-        logger.info(f"  ✓ Clases detectadas: {class_map}")
+        logger.info(f"  [OK] Clases detectadas: {class_map}")
     except (FileNotFoundError, KeyError) as e:
         logger.error(str(e))
         sys.exit(1)
@@ -406,7 +400,7 @@ Ejemplos:
         duration = end_time - start_time
 
         logger.info("\n" + "="*60)
-        logger.info("✓ ENTRENAMIENTO COMPLETADO")
+        logger.info("[OK] ENTRENAMIENTO COMPLETADO")
         logger.info("="*60)
         logger.info(f"Tiempo total: {duration}")
         logger.info(f"Resultados guardados en: {output_dir}")
@@ -423,7 +417,7 @@ Ejemplos:
             logger.info(f"  cat {results_csv}")
 
     except Exception as e:
-        logger.error(f"\n✗ Error durante el entrenamiento: {e}")
+        logger.error(f"\n[ERROR] Error durante el entrenamiento: {e}")
         logger.exception("Detalles del error:")
         sys.exit(1)
 

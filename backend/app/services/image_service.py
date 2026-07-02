@@ -20,8 +20,8 @@ class LoadedImage:
     resolution_y: float
     resolution_unit: str | None = None
     crs: str | None = None
-    # Affine transform píxel → CRS (6 floats: a, b, c, d, e, f)
-    # X = a*col + b*row + c · Y = d*col + e*row + f
+    # Affine transform from pixel coordinates to CRS: a, b, c, d, e, f.
+    # X = a*col + b*row + c; Y = d*col + e*row + f.
     transform: list[float] | None = None
     parcel_area_hectares: float | None = None
     location_center_lat: float | None = None
@@ -208,7 +208,7 @@ def load_regular_image_from_bytes(content: bytes) -> LoadedImage:
     if unsupported_format:
         raise ValueError(
             f"Formato {unsupported_format} no soportado para inferencia. "
-            "Convierte la imagen a JPEG o PNG real antes de subirla; cambiar la extension no cambia el formato interno."
+            "Formato no soportado para inferencia. Se requiere un archivo JPEG o PNG real; cambiar la extension no modifica el formato interno."
         )
 
     try:
@@ -217,12 +217,12 @@ def load_regular_image_from_bytes(content: bytes) -> LoadedImage:
         if exc.name == "pi_heif":
             raise ValueError(
                 "La imagen parece estar en formato HEIF/AVIF y requiere una dependencia no disponible en el backend. "
-                "Convierte la imagen a JPEG o PNG real antes de subirla."
+                "Se requiere convertir la imagen a JPEG o PNG real antes de la carga."
             ) from exc
         raise
     except UnidentifiedImageError as exc:
         raise ValueError(
-            "No se pudo leer la imagen. Comprueba que el archivo sea un JPEG, PNG o GeoTIFF valido y que la extension coincida con el formato real."
+            "No se pudo leer la imagen. El archivo debe ser JPEG, PNG o GeoTIFF valido y la extension debe coincidir con el formato real."
         ) from exc
 
     arr = np.array(image)

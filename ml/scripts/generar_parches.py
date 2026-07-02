@@ -244,7 +244,7 @@ class YoloPatcher:
         self.log.info("MODO ESTÁNDAR: Se procesarán todas las parejas raster-vector encontradas por nombre.")
 
         if not raster_map or not vector_files:
-            self.log.error("No se encontraron archivos raster/vector para procesar. Revisa las rutas configuradas.")
+            self.log.error("No se encontraron archivos raster/vector para procesar. Comprobar las rutas configuradas.")
             return
 
         label_col = None

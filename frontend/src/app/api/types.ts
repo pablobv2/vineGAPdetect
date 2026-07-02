@@ -33,7 +33,7 @@ export interface ImageMeta {
   resolution_y: number;
   resolution_unit?: string | null;
   crs?: string | null;
-  /** Affine transform píxel→CRS: [a, b, c, d, e, f] */
+  /** Affine transform píxel->CRS: [a, b, c, d, e, f] */
   transform?: number[] | null;
   parcel_area_hectares?: number | null;
   location_center_lat?: number | null;

@@ -63,7 +63,7 @@ export function LeftRail({
             </div>
             <div style={{ padding: "12px 20px 16px", borderTop: "1px solid var(--vg-line-soft)" }}>
               <p style={{ fontSize: 12, color: "var(--vg-ink-md)", lineHeight: 1.5, marginBottom: 14 }}>
-                El ortomosaico se muestra sin procesar. Cambia al modo detección para ejecutar inferencia.
+                El ortomosaico se muestra sin procesar. El modo detecci?n permite ejecutar inferencia.
               </p>
               {canRunAnalysis && (
                 <button className="btn btn-accent btn-full" onClick={onRunInference} disabled={inferenceRunning}>

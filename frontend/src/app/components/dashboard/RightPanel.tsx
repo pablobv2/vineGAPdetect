@@ -44,7 +44,7 @@ export function RightPanel({
     <aside style={{ width: 320, flexShrink: 0, borderLeft: "1px solid var(--vg-line)", background: "var(--vg-panel)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
       <div style={{ overflowY: "auto", flex: 1, display: "flex", flexDirection: "column" }}>
 
-        {/* ── Section label ── */}
+        {/* Section label */}
         <div className="section-label">
           <span>Resultados</span>
         </div>

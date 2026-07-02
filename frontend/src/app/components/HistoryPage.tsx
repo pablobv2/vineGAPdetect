@@ -189,7 +189,7 @@ export function HistoryPage() {
             {isAdmin
               ? "Todas las parcelas guardadas en el sistema."
               : "Tus parcelas guardadas. Guarda una parcela desde el dashboard tras ejecutar la inferencia."}{" "}
-            Haz clic en una fila para restaurar el análisis en el visualizador.
+            Seleccionar una fila restaura el an?lisis en el visualizador.
           </p>
           {quota && !isAdmin && (
             <div style={{ maxWidth: 440 }}>
@@ -222,7 +222,7 @@ export function HistoryPage() {
           <div
             style={{ padding: "12px 16px", background: "color-mix(in srgb, #c0392b 12%, var(--vg-bg))", border: "1px solid #c0392b", color: "#c0392b", fontSize: 13, borderRadius: 2, marginBottom: 16, cursor: "pointer" }}
             onClick={() => setError(null)}
-            title="Haz clic para cerrar"
+            title="Cerrar aviso"
           >
             {error}
           </div>
@@ -230,7 +230,7 @@ export function HistoryPage() {
 
         {!loading && !error && rows.length === 0 && (
           <div style={{ padding: "40px 0", color: "var(--vg-ink-lo)", fontSize: 13, textAlign: "center" }}>
-            No hay parcelas guardadas todavía. Ejecuta una inferencia y pulsa "Guardar parcela" en el dashboard.
+            No hay parcelas guardadas todav?a. Las parcelas aparecen tras guardar una inferencia desde el dashboard.
           </div>
         )}
 

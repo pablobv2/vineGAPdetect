@@ -270,7 +270,7 @@ def save_history_item(
             raise HTTPException(
                 status_code=409,
                 detail=(
-                    f"No hay suficiente espacio en tu inventario "
+                    f"No hay suficiente espacio en el inventario del usuario "
                     f"({used_gb:.2f} GB de 5 GB usados). "
                     "Libera espacio eliminando parcelas desde Mis parcelas."
                 ),

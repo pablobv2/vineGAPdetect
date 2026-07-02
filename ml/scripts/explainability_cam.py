@@ -27,7 +27,7 @@ try:
 except ImportError:
     print("\n" + "="*80)
     print("Error: No se pudo importar el módulo 'yolo_cam'.")
-    print("Por favor, sigue las instrucciones del README para colocar la carpeta 'yolo_cam' en tu proyecto.")
+    print("La carpeta 'yolo_cam' debe estar disponible segun la configuracion indicada en el README.")
     print("="*80 + "\n")
     sys.exit(1)
 
@@ -69,13 +69,7 @@ def _build_gradcam_targets(detections, model) -> list[YOLOBoxScoreTarget] | None
 
 def print_banner():
     """Imprime un banner de bienvenida para el script."""
-    banner = """
-    ╔════════════════════════════════════════════════════════════╗
-    ║      vineGAPdetect - Módulo de Explicabilidad (XAI) con CAM      ║
-    ║                  Visualizando Decisiones de YOLO             ║
-    ╚════════════════════════════════════════════════════════════╝
-    """
-    print(banner)
+    print("vineGAPdetect - explicabilidad CAM")
 
 def find_latest_model(project_dir: Path) -> Path:
     """Encuentra el archivo 'best.pt' del entrenamiento más reciente."""
@@ -210,7 +204,7 @@ def main():
             args.imgsz,
         )
 
-    logger.info("\n" + "="*60 + "\n✓ Proceso de explicabilidad completado.\n" + f"Resultados guardados en: {output_dir.resolve()}\n" + "="*60)
+    logger.info("\n" + "="*60 + "\n[OK] Proceso de explicabilidad completado.\n" + f"Resultados guardados en: {output_dir.resolve()}\n" + "="*60)
 
 if __name__ == "__main__":
     main()

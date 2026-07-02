@@ -113,13 +113,7 @@ CONFIGURATIONS = generate_configurations()
 
 def print_banner():
     """Imprime banner de inicio."""
-    banner = """
-    ╔════════════════════════════════════════════════════════════╗
-    ║       vineGAPdetect - Comparación Tamaños de Parche            ║
-    ║          Modelos: Nano vs Large | Parches: 5 Tamaños      ║
-    ╚════════════════════════════════════════════════════════════╝
-    """
-    print(banner)
+    print("vineGAPdetect - comparacion de configuraciones")
 
 
 def generate_dataset(patch_size: int, output_dir: str) -> Dict[str, Any]:
@@ -159,7 +153,7 @@ def generate_dataset(patch_size: int, output_dir: str) -> Dict[str, Any]:
         end_time = datetime.now()
         duration = (end_time - start_time).total_seconds()
 
-        logger.info(f"✓ Dataset generado en {duration/60:.1f} minutos")
+        logger.info(f"[OK] Dataset generado en {duration/60:.1f} minutos")
 
         return {
             "name": f"dataset_{patch_size}px",
@@ -173,7 +167,7 @@ def generate_dataset(patch_size: int, output_dir: str) -> Dict[str, Any]:
         end_time = datetime.now()
         duration = (end_time - start_time).total_seconds()
 
-        logger.error(f"✗ Error generando dataset")
+        logger.error(f"[ERROR] Error generando dataset")
 
         return {
             "name": f"dataset_{patch_size}px",
@@ -202,7 +196,7 @@ def validate_dataset(dataset_path: Path) -> bool:
 
 def run_training(config: Dict[str, Any], dataset_dir: str) -> Dict[str, Any]:
     """
-    Ejecuta un entrenamiento con la configuración especificada.
+    Lanza un entrenamiento con la configuración especificada.
 
     Returns:
         Dict con información del resultado (success, duration, metrics, etc.)
@@ -245,7 +239,7 @@ def run_training(config: Dict[str, Any], dataset_dir: str) -> Dict[str, Any]:
         end_time = datetime.now()
         duration = (end_time - start_time).total_seconds()
 
-        logger.info(f"✓ Completado: {config['name']} en {duration/60:.1f} minutos")
+        logger.info(f"[OK] Completado: {config['name']} en {duration/60:.1f} minutos")
 
         return {
             "name": config["name"],
@@ -261,7 +255,7 @@ def run_training(config: Dict[str, Any], dataset_dir: str) -> Dict[str, Any]:
         end_time = datetime.now()
         duration = (end_time - start_time).total_seconds()
 
-        logger.error(f"✗ Error en: {config['name']}")
+        logger.error(f"[ERROR] Error en: {config['name']}")
         logger.error(f"Código de salida: {e.returncode}")
 
         return {
@@ -366,7 +360,7 @@ def generate_comparison_report(results: List[Dict[str, Any]], output_path: Path)
             "Tamaño Parche": f"{result['config']['imgsz']}px",
             "Batch Size": result['config']['batch'],
             "Épocas": result['config']['epochs'],
-            "Estado": "✓" if result["success"] else "✗",
+            "Estado": "[OK]" if result["success"] else "[ERROR]",
             "Duración (min)": round(result["duration_seconds"] / 60, 1),
         }
 
@@ -383,7 +377,7 @@ def generate_comparison_report(results: List[Dict[str, Any]], output_path: Path)
 
     # Guardar CSV
     df.to_csv(output_path, index=False)
-    logger.info(f"\n✓ Reporte guardado en: {output_path}")
+    logger.info(f"\n[OK] Reporte guardado en: {output_path}")
 
     # Mostrar tabla resumida
     print("\n" + "="*80)
@@ -417,9 +411,9 @@ def generate_comparison_report(results: List[Dict[str, Any]], output_path: Path)
 
     # Mejor configuración
     if 'mAP@50-95' in df.columns and successful > 0:
-        best_idx = df[df['Estado'] == '✓']['mAP@50-95'].idxmax()
+        best_idx = df[df['Estado'] == '[OK]']['mAP@50-95'].idxmax()
         best = df.iloc[best_idx]
-        logger.info(f"\n🏆 MEJOR CONFIGURACIÓN (mAP@50-95):")
+        logger.info(f"\n MEJOR CONFIGURACIÓN (mAP@50-95):")
         logger.info(f"  Experimento: {best['Experimento']}")
         logger.info(f"  Modelo: {best['Modelo']}")
         logger.info(f"  Tamaño Parche: {best['Tamaño Parche']}")
@@ -439,7 +433,7 @@ def main():
     parser.add_argument("--regenerate-report", action="store_true",
                         help="Regenerar reporte desde resultados guardados (no entrena)")
     parser.add_argument("--yes", action="store_true",
-                        help="Ejecuta el plan completo sin pedir confirmacion interactiva")
+                        help="Lanza el plan completo sin confirmacion interactiva")
     args = parser.parse_args()
 
     print_banner()
@@ -452,20 +446,20 @@ def main():
 
         if not partial_path.exists():
             logger.error(f"No se encontró {partial_path}")
-            logger.error("Ejecuta primero: python scripts/compare_models.py")
+            logger.error("Falta ejecutar previamente: python scripts/compare_models.py")
             sys.exit(1)
 
         with open(partial_path, 'r') as f:
             results = json.load(f)
 
-        logger.info(f"✓ Cargados {len(results)} resultados guardados")
-        logger.info("⚠️  Validando cada best.pt (puede tardar unos minutos)...\n")
+        logger.info(f"[OK] Cargados {len(results)} resultados guardados")
+        logger.info("AVISO️  Validando cada best.pt (puede tardar unos minutos)...\n")
 
         # Generar reporte
         report_path = RESULTS_DIR / "comparison_report.csv"
         generate_comparison_report(results, report_path)
 
-        logger.info(f"\n✓ Reporte regenerado exitosamente en: {report_path}")
+        logger.info(f"\n[OK] Reporte regenerado exitosamente en: {report_path}")
         return
 
     # Modo normal: Mostrar plan completo
@@ -479,7 +473,7 @@ def main():
     # Mostrar plan agrupado por tamaño de parche
     for patch_size in PATCH_SIZES:
         print(f"\n--- Parche {patch_size}px ---")
-        print(f"  1. Generar dataset → data/datasets/yolo_marras_{patch_size}px")
+        print(f"  1. Generar dataset -> data/datasets/yolo_marras_{patch_size}px")
         print(f"  2. Entrenar YOLO11-nano (batch: {MODELS['nano']['batch_sizes'][patch_size]})")
         print(f"  3. Entrenar YOLO11-large (batch: {MODELS['large']['batch_sizes'][patch_size]})")
 
@@ -490,13 +484,13 @@ def main():
     logger.info(f"Épocas totales de entrenamiento: {total_epochs}")
     logger.info(f"Épocas por entrenamiento: {EPOCHS}")
     logger.info(f"Patience: {PATIENCE}")
-    logger.info("\n⚠️  Este proceso puede tardar MUCHAS HORAS:")
+    logger.info("\nAVISO️  Este proceso puede tardar MUCHAS HORAS:")
     logger.info(f"    - Generación datasets: ~{len(PATCH_SIZES)*0.5:.1f}h (estimado)")
     logger.info(f"    - Entrenamientos: ~10-20h (dependiendo de GPU)")
     logger.info(f"    - Total estimado: 12-25 horas")
 
     if not args.yes:
-        response = input("\n¿Continuar? [s/N]: ").strip().lower()
+        response = input("\n¿Continuar[OK] [s/N]: ").strip().lower()
         if response not in ['s', 'si', 'sí', 'y', 'yes']:
             logger.info("Cancelado por el usuario.")
             sys.exit(0)
@@ -554,10 +548,10 @@ def main():
     with open(json_path, 'w', encoding='utf-8') as f:
         json.dump(full_results, f, indent=2, ensure_ascii=False)
 
-    logger.info(f"\n✓ Resultados completos guardados en: {json_path}")
-    logger.info(f"✓ Tiempo total de comparación: {overall_duration/3600:.2f} horas")
+    logger.info(f"\n[OK] Resultados completos guardados en: {json_path}")
+    logger.info(f"[OK] Tiempo total de comparación: {overall_duration/3600:.2f} horas")
     logger.info("\n" + "="*70)
-    logger.info("🎉 COMPARACIÓN COMPLETADA")
+    logger.info(" COMPARACIÓN COMPLETADA")
     logger.info("="*70)
     logger.info(f"\nRevisa los resultados en:")
     logger.info(f"  - CSV: {report_path}")
